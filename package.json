@@ -70,6 +70,7 @@
     "@electron-forge/maker-zip": "6.0.0-beta.51",
     "@electron-forge/plugin-webpack": "6.0.0-beta.51",
     "@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
+    "@types/react-router-dom": "^5.1.5",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
     "babel-loader": "^8.1.0",
@@ -86,7 +87,10 @@
     "typescript": "^3.7.0"
   },
   "dependencies": {
+    "@babel/core": "^7.9.6",
     "@hot-loader/react-dom": "^16.13.0",
+    "@material-ui/core": "^4.9.14",
+    "@material-ui/styles": "^4.9.14",
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
     "electron-squirrel-startup": "^1.0.0",
@@ -94,6 +98,7 @@
     "react-dom": "^16.13.1",
     "react-hot-loader": "^4.12.21",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^3.4.1"
+    "react-scripts": "^3.4.1",
+    "webpack": "^4.43.0"
   }
 }
