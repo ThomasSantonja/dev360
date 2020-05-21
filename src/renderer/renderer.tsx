@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import '../../public/index.scss';
+import { CustomTheme } from './theme/CustomTheme';
 
 console.log('👋 This message is being logged by "renderer.tsx", included via webpack');
 
