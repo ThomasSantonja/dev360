@@ -1,14 +1,18 @@
-import React, { Component } from 'react';
-import { createStyles, makeStyles, Theme, createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import { CssBaseline, SvgIcon, Drawer, Divider, List, ListItem, ListItemIcon, ListItemText, ThemeOptions } from '@material-ui/core';
+import React, { useEffect, ReactElement, useState } from 'react';
+import { createStyles, makeStyles, Theme, ThemeProvider } from '@material-ui/core/styles';
+import { CssBaseline } from '@material-ui/core';
 import { CustomTheme } from './theme/CustomTheme';
 import Navigation from './components/Navigation';
-import InProgress from './views/InProgress';
-import Incidents from './views/Incidents';
+import IncidentsView from './views/Incidents';
 import { Switch, Route, MemoryRouter } from 'react-router-dom';
+import InProgressView from './views/InProgress';
 
 const theme = CustomTheme.Dark;
+
+export class RouteLogic {
+  static Name: string;
+  static Svg: Element;
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,20 +36,32 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function App() {
+export default function App(...props: any[]) {
   const classes = useStyles();
+
+  const [currentRoute, setRoute] = useState<string>( "Welcome");
+
+  // function handleRouteChange(componentName: string, componentIcon: ReactElement) {
+  //   console.log(`app event on route changed from ${componentName}`);
+  //   //setRoute(componentName); <- Not allowed, since the execution is triggered from the child a ugly fix:
+  //   //setTimeout(() => { setRoute(componentName); }, 0); <- this works because it swaps the execution context
+  //   //setRoute.bind(this)(componentName); <- this does not work because I do not understand this in react yet
+  //   useEffect(() => { setRoute(componentName); });
+  // }
+
+  console.log(`app props parameter: ${props?.length}, ${props[0]}, ${props[1]}`);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <MemoryRouter>
+      <MemoryRouter >
         <div className={classes.root}>
-          <Navigation />
+          <Navigation route={currentRoute} />
           <main className={classes.content}>
             <div className={classes.toolbar} />
             <Switch>
-              <Route exact path='/incidents' component={Incidents} />
-              <Route component={InProgress} />
+              <Route exact path='/incidents' render={() => <IncidentsView routeSetter={setRoute} route={currentRoute} />} />
+              <Route render={() => <InProgressView routeSetter={setRoute} route={currentRoute} />} />
             </Switch>
           </main>
         </div>

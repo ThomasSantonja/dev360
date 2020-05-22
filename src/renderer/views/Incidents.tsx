@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Typography, makeStyles, createStyles, Grid, Paper, Theme } from "@material-ui/core";
+import IncidentsIcon from "../components/icons/IncidentsIcon";
 
 const incidentStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -14,32 +15,101 @@ const incidentStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export default function IncidentsView() {
+export interface ViewModelProps{
+    routeSetter: React.Dispatch<React.SetStateAction<string>>;
+    route?: string
+}
+
+const pageName = "Incidents";
+
+export default function IncidentsView(props: Readonly<ViewModelProps>) {
+
     const classes = incidentStyles();
+    console.log(`incidents view props: ${props}`);
+    if (props?.routeSetter) {
+        if (props?.route !== pageName) {
+            props.routeSetter(pageName), 0;
+        }
+    }
 
     return (
         <div className={classes.root}>
-            <Grid container spacing={3}>
-                <Grid item xs>
-                    <Paper className={classes.paper}>xs</Paper>
-                </Grid>
-                <Grid item xs>
-                    <Paper className={classes.paper}>xs</Paper>
-                </Grid>
-                <Grid item xs>
-                    <Paper className={classes.paper}>xs</Paper>
-                </Grid>
-            </Grid>
-            <Grid container spacing={3}>
-                <Grid item xs>
-                    <Paper className={classes.paper}>xs</Paper>
-                </Grid>
-                <Grid item xs={6}>
-                    <Paper className={classes.paper}>xs=6</Paper>
-                </Grid>
-                <Grid item xs>
-                    <Paper className={classes.paper}>xs</Paper>
-                </Grid>
+            <Grid
+                container
+                spacing={4}
+            >
+                <Grid
+                    item
+                    lg={3}
+                    sm={6}
+                    xl={3}
+                    xs={12}
+                >
+                    Total Nb Incidents
+        </Grid>
+                <Grid
+                    item
+                    lg={3}
+                    sm={6}
+                    xl={3}
+                    xs={12}
+                >
+                    Not sure yet
+        </Grid>
+                <Grid
+                    item
+                    lg={3}
+                    sm={6}
+                    xl={3}
+                    xs={12}
+                >
+                    Same
+        </Grid>
+                <Grid
+                    item
+                    lg={3}
+                    sm={6}
+                    xl={3}
+                    xs={12}
+                >
+                    Same
+        </Grid>
+                <Grid
+                    item
+                    lg={8}
+                    md={12}
+                    xl={9}
+                    xs={12}
+                >
+                    Timeline
+        </Grid>
+                <Grid
+                    item
+                    lg={4}
+                    md={6}
+                    xl={3}
+                    xs={12}
+                >
+                    Root Cause
+        </Grid>
+                <Grid
+                    item
+                    lg={4}
+                    md={6}
+                    xl={3}
+                    xs={12}
+                >
+                    Highest hit repositories
+        </Grid>
+                <Grid
+                    item
+                    lg={8}
+                    md={12}
+                    xl={9}
+                    xs={12}
+                >
+                    Teams
+        </Grid>
             </Grid>
         </div>
     );

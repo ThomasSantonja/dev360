@@ -13,6 +13,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
+import { RouteLogic } from "../App";
 
 const theme = CustomTheme.Dark;
 const drawerOpenWidth = 200;
@@ -45,12 +46,6 @@ const localAppBarStyles = makeStyles((theme: Theme) =>
         },
         menuTypo: {
             lineHeight: theme.spacing(4) + "px",
-        },
-        appTitle: {
-            padding: theme.spacing(1),
-            width: "100%",
-            textAlign: "left",
-            display: "flex"
         },
         link: {
             color: theme.palette.text.primary,
@@ -100,9 +95,11 @@ const localAppBarStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export default function Navigation() {
+export default function Navigation(props: Readonly<{route: any}>) {
     const classes = localAppBarStyles();
     const [open, setOpen] = React.useState(false);
+
+    console.log(`navigation refresh props: ${props}`);
 
     const handleDrawer = () => {
         setOpen(!open);
@@ -125,7 +122,7 @@ export default function Navigation() {
                         {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                     </IconButton>
                     <Typography variant="h6" noWrap>
-                        Incidents
+                        {props.route}
                     </Typography>
                 </Toolbar>
             </AppBar>
