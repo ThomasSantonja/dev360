@@ -1,6 +1,6 @@
 import { ipcRenderer, IpcRendererEvent } from "electron";
-import { Dictionary } from "src/main/utils/dictionary";
-import { ElectronResponse, ElectronRequest } from "src/main/models/app-api-payload";
+import { Dictionary } from "../../main/utils/dictionary";
+import { ElectronResponse, ElectronRequest } from "../../main/models/app-api-payload";
 import hash from "object-hash";
 
 export class ClientRequestHandler {

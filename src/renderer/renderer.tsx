@@ -1,16 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import StatefulApp from './App';
 import * as serviceWorker from './serviceWorker';
 import '../../public/index.scss';
 import { CustomTheme } from './theme/CustomTheme';
 import { ClientRequestHandler } from './data/clientRequestHandler';
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
 
 console.log('👋 This message is being logged by "renderer.tsx", included via webpack');
 
 ClientRequestHandler.initialise();
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+ReactDOM.render(
+    (<Provider store={store}>
+        <StatefulApp />
+    </Provider>),
+    document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

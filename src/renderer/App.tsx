@@ -1,11 +1,14 @@
-import React, { useEffect, ReactElement, useState } from 'react';
+import React, { useEffect, ReactElement, useState, Dispatch } from 'react';
 import { createStyles, makeStyles, Theme, ThemeProvider } from '@material-ui/core/styles';
 import { CssBaseline } from '@material-ui/core';
 import { CustomTheme } from './theme/CustomTheme';
-import Navigation from './components/Navigation';
 import IncidentsView from './views/Incidents';
 import { Switch, Route, MemoryRouter } from 'react-router-dom';
 import InProgressView from './views/InProgress';
+import { connect } from 'react-redux';
+import { State } from './redux/store';
+import StatefulNavigation from './components/Navigation';
+import { ChangeRouteCommand, ChangeRoute } from "./redux/viewModels/appViewModel";
 
 const theme = CustomTheme.Dark;
 
@@ -36,10 +39,11 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function App(...props: any[]) {
+export function App(props: Readonly<{ route?: string, routeChangeHandler?: any }>) {
   const classes = useStyles();
 
-  const [currentRoute, setRoute] = useState<string>( "Welcome");
+  //const [currentRoute, setRoute] = useState<string>("Welcome");
+
 
   // function handleRouteChange(componentName: string, componentIcon: ReactElement) {
   //   console.log(`app event on route changed from ${componentName}`);
@@ -49,23 +53,49 @@ export default function App(...props: any[]) {
   //   useEffect(() => { setRoute(componentName); });
   // }
 
-  console.log(`app props parameter: ${props?.length}, ${props[0]}, ${props[1]}`);
+  //console.log(`app props parameter: ${props?.length}, ${props[0]}, ${props[1]}`);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <MemoryRouter >
-        <div className={classes.root}>
-          <Navigation route={currentRoute} />
-          <main className={classes.content}>
-            <div className={classes.toolbar} />
-            <Switch>
-              <Route exact path='/incidents' render={() => <IncidentsView routeSetter={setRoute} route={currentRoute} />} />
-              <Route render={() => <InProgressView routeSetter={setRoute} route={currentRoute} />} />
-            </Switch>
-          </main>
-        </div>
-      </MemoryRouter>
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <MemoryRouter >
+          <div className={classes.root}>
+            <StatefulNavigation />
+            <main className={classes.content}>
+              <div className={classes.toolbar} />
+              <Switch>
+                <Route exact path='/incidents' render={
+                  () => {
+                    props.routeChangeHandler("Incidents");
+                    return (<IncidentsView />);
+                  }
+                } />
+                <Route render={
+                  () => {
+                    props.routeChangeHandler("In Progress");
+                    return (<InProgressView />);
+                  }
+                } />
+              </Switch>
+            </main>
+          </div>
+        </MemoryRouter>
+      </ThemeProvider>
   );
 }
+
+const mapStateToProps = (state: State) => (
+  {
+    route: state.UpdateApplicationState.Route
+  });
+
+const mapDispatchToProps = (dispatch: Dispatch<ChangeRouteCommand>) => {
+  return {
+    routeChangeHandler: (newRoute: string) => {
+      dispatch(ChangeRoute(newRoute));
+    }
+  }
+}
+
+const StatefulApp = connect(mapStateToProps, mapDispatchToProps)(App);
+export default StatefulApp;

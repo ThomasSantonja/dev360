@@ -1,8 +1,6 @@
-import React from "react";
+import React, { Dispatch, Props } from "react";
 import { Typography, Container, makeStyles, createStyles, Theme } from "@material-ui/core";
-import { RouteLogic } from "../App";
 import InProgress from "../components/icons/InProgress";
-import { ViewModelProps } from "./Incidents";
 
 const inProgressStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -21,16 +19,9 @@ const inProgressStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const pageName = "InProgress";
 
-export default function InProgressView(props: Readonly<ViewModelProps>) {
+export default function InProgressView(props: Readonly<any>) {
     const classes = inProgressStyles();
-
-    if (props?.routeSetter) {
-        if (props?.route !== pageName) {
-            props.routeSetter(pageName), 0;
-        }
-    }
 
     return (
         <Container className={classes.root} maxWidth="sm">
@@ -38,139 +29,149 @@ export default function InProgressView(props: Readonly<ViewModelProps>) {
             <Typography paragraph>
                 Work in progress
             </Typography>
-            <Clock />
-            <Calculator />
+            <AddTodoBound />
+            <VisibleTodoList />
+            <Footer />
         </Container>
     );
 }
 
-class Clock extends React.Component<{}, { date: Date }> {
+import { connect, Provider } from "react-redux";
+import { Todo, TodoFilterCommandNames, FilterCommand, setVisibilityFilter, toggleTodo, addTodo, getVisibleTodos, TodoTextCommand, TodoIndexCommand } from "../redux/viewModels/todoViewModel";
+import { State } from "../redux/store";
 
-    timerID: any;
+//console.log(store.getState());
+// const unsubscribe = store.subscribe(() => console.log(store.getState()))
 
-    constructor(props: Readonly<{ date: Date }>) {
-        super(props);
-        this.state = { date: new Date() };
-    }
+// Dispatch some actions
+// store.dispatch(addTodo('Learn about actions'));
+// store.dispatch(addTodo('Learn about reducers'));
+// store.dispatch(addTodo('Learn about store'));
+// store.dispatch(toggleTodo(0));
+// store.dispatch(toggleTodo(1));
+// store.dispatch(setVisibilityFilter(VisibilityFiltersOptions.SHOW_COMPLETED));
 
-    componentDidMount() {
-        this.timerID = setInterval(
-            () => this.tick(),
-            1000
-        );
-    }
+// unsubscribe();
 
-    tick() {
-        this.setState({
-            date: new Date()
-        });
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.timerID);
-    }
-
-    render() {
-        return (
-            <div>
-                <h2>It is {this.state.date.toLocaleTimeString()}.</h2>
-            </div>
-        );
-    }
-}
-
-function BoilingVerdict(props: Readonly<{ celsius: number }>) {
-    if (props.celsius >= 100) {
-        return <p>The water would boil.</p>;
-    }
-    return <p>The water would not boil.</p>;
-}
-
-class Calculator extends React.Component<{}, { temperature: any, scale: string }> {
-    constructor(props: Readonly<{}>) {
-        super(props);
-        this.handleCelsiusChange = this.handleCelsiusChange.bind(this);
-        this.handleFahrenheitChange = this.handleFahrenheitChange.bind(this);
-        this.state = { temperature: '', scale: 'c' };
-    }
-
-    handleCelsiusChange(temperature: string) {
-        this.setState({ scale: 'c', temperature });
-    }
-
-    handleFahrenheitChange(temperature: string) {
-        this.setState({ scale: 'f', temperature });
-    }
-
-    render() {
-        const scale = this.state.scale;
-        const temperature = this.state.temperature;
-        const celsius = scale === 'f' ? tryConvert(temperature, toCelsius) : temperature;
-        const fahrenheit = scale === 'c' ? tryConvert(temperature, toFahrenheit) : temperature;
-
-        return (
-            <div>
-                <TemperatureInput
-                    scale="c"
-                    temperature={celsius}
-                    onTemperatureChange={this.handleCelsiusChange} />
-                <TemperatureInput
-                    scale="f"
-                    temperature={fahrenheit}
-                    onTemperatureChange={this.handleFahrenheitChange} />
-                <BoilingVerdict
-                    celsius={parseFloat(celsius)} />
-            </div>
-        );
-    }
-}
-
-interface IScale { [key: string]: string }
-
-const scaleNames: IScale = {
-    c: 'Celsius',
-    f: 'Fahrenheit'
+function Todo(props: { onClick?: any, completed: boolean, text: string }) {
+    return (
+        <li
+            style={{
+                textDecoration: props.completed ? 'line-through' : 'none'
+            }}
+        >
+            <a href=""
+                onClick={e => {
+                    e.preventDefault()
+                    console.log(`clicking on the todo should trigger the onclick prop`);
+                    props.onClick()
+                }}>{props.text}</a>
+        </li>);
 };
 
-class TemperatureInput extends React.Component<{ scale: string, temperature: number, onTemperatureChange: any }, { temperature: any }> {
-    constructor(props: any) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
-        this.state = { temperature: '' };
-    }
+function TodoList(props: { todos: Array<Todo>, onTodoClick: (id: number) => any }) {
 
-    handleChange(e: any) {
-        this.props.onTemperatureChange(e.target.value);
-        //this.setState({ temperature: e.target.value });
-    }
+    console.log(`content of the props`, props);
 
-    render() {
-        const temperature = this.props.temperature;
-        const scale = this.props.scale;
-        return (
-            <fieldset>
-                <legend>Enter temperature in {scaleNames[scale]}:</legend>
-                <input value={temperature}
-                    onChange={this.handleChange} />
-            </fieldset>
-        );
+    return (
+        props.todos.length > 0 ? <ul>
+            {props.todos.map((todo, index) => (
+                <Todo key={todo.id} {...todo} onClick={() => {
+                    console.log(`Click on the children : ${todo.id}`);
+                    props?.onTodoClick(todo.id)
+                }} />
+            ))}
+        </ul> :
+            "No todo"
+    )
+};
+
+const st2 = (Vms: State) => {
+    console.log(`mapping todos to the todo list props from the store`, Vms);
+    return {
+        todos: getVisibleTodos(Vms.todoStateEditor, Vms.todoFilterStateEditor)
     }
 }
 
-function toCelsius(fahrenheit: number): number {
-    return (fahrenheit - 32) * 5 / 9;
-}
-
-function toFahrenheit(celsius: number): number {
-    return (celsius * 9 / 5) + 32;
-}
-
-function tryConvert(temperature: string, convert: (val: number) => number) {
-    const input = parseFloat(temperature);
-    if (Number.isNaN(input)) {
-        return '';
+const ds2 = (dispatch: Dispatch<TodoIndexCommand>) => {
+    return {
+        onTodoClick: (id: number) => {
+            dispatch(toggleTodo(id))
+        }
     }
-    const output = convert(input);
-    const rounded = Math.round(output * 1000) / 1000;
-    return rounded.toString();
 }
+
+const VisibleTodoList = connect(st2, ds2)(TodoList as any);
+
+function Link(props: { active: boolean, children: string, onClick: any }) {
+    if (props.active) {
+        return <span>{props.children}</span>
+    }
+
+    return (
+        <a
+            href=""
+            onClick={e => {
+                e.preventDefault()
+                props.onClick()
+            }}
+        >
+            {props.children}
+        </a>
+    )
+};
+
+const st1 = (state: State, ownProps: { filter: string }) => {
+    return {
+        active: ownProps.filter === state.todoFilterStateEditor
+    }
+}
+
+const ds1 = (dispatch: Dispatch<FilterCommand>, ownProps: { filter: string }) => {
+    return {
+        onClick: () => {
+            dispatch(setVisibilityFilter(ownProps.filter))
+        }
+    }
+}
+
+const FilterLink = connect(st1, ds1)(Link);
+
+function Footer() {
+    return (
+        <p>
+            Show: <FilterLink filter={TodoFilterCommandNames.SHOW_ALL}>All</FilterLink>
+            {', '}
+            <FilterLink filter={TodoFilterCommandNames.SHOW_ACTIVE}>Active</FilterLink>
+            {', '}
+            <FilterLink filter={TodoFilterCommandNames.SHOW_COMPLETED}>Completed</FilterLink>
+        </p>
+    )
+};
+
+let AddTodo = function (props: { dispatch: Dispatch<TodoTextCommand> }) {
+    let input: any;
+
+    return (
+        <div>
+            <form
+                onSubmit={e => {
+                    e.preventDefault()
+                    if (!input.value.trim()) {
+                        return
+                    }
+                    props.dispatch(addTodo(input.value))
+                    input.value = ''
+                }}
+            >
+                <input
+                    ref={node => {
+                        input = node
+                    }}
+                />
+                <button type="submit">Add Todo</button>
+            </form>
+        </div>
+    )
+}
+const AddTodoBound = connect()(AddTodo as any);

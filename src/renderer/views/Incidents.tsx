@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Typography, makeStyles, createStyles, Grid, Paper, Theme } from "@material-ui/core";
-import IncidentsIcon from "../components/icons/IncidentsIcon";
 
 const incidentStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -15,22 +14,9 @@ const incidentStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export interface ViewModelProps{
-    routeSetter: React.Dispatch<React.SetStateAction<string>>;
-    route?: string
-}
-
-const pageName = "Incidents";
-
-export default function IncidentsView(props: Readonly<ViewModelProps>) {
+export default function IncidentsView(props: Readonly<any>) {
 
     const classes = incidentStyles();
-    console.log(`incidents view props: ${props}`);
-    if (props?.routeSetter) {
-        if (props?.route !== pageName) {
-            props.routeSetter(pageName), 0;
-        }
-    }
 
     return (
         <div className={classes.root}>

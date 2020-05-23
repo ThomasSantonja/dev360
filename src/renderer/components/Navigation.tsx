@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch } from "react";
 import { Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, makeStyles, Theme, createStyles, AppBar } from "@material-ui/core";
 import DashboardIcon from "./icons/DashboardIcon";
 import IncidentsIcon from "./icons/IncidentsIcon";
@@ -17,6 +17,9 @@ import { Link } from 'react-router-dom';
 import { RouteLogic } from "../App";
 import { ClientRequestHandler } from "../data/clientRequestHandler";
 import { ElectronResponse } from "src/main/models/app-api-payload";
+import { State } from "../redux/store";
+import { OpenMainDrawerCommand, ToggleDrawerOpenStatus } from "../redux/viewModels/appViewModel";
+import { connect } from "react-redux";
 
 const theme = CustomTheme.Dark;
 const drawerOpenWidth = 200;
@@ -101,39 +104,32 @@ const localAppBarStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export default function Navigation(props: Readonly<{ route: any }>) {
+export function Navigation(props: Readonly<{ open?: boolean, route?: any, handleDrawerClick?: any }>) {
     const classes = localAppBarStyles();
-    const [open, setOpen] = React.useState(false);
+    //const [open, setOpen] = React.useState(false);
 
     console.log(`navigation refresh props: ${props}`);
 
-    const handleDrawer = () => {
-        setOpen(!open);
-    };
-
-    const receiveRawData = (response: ElectronResponse) => {
-
-    }
-
-    const handleRefresh = () => {
-        ClientRequestHandler.sendAsyncMessage(this.dataRequest, receiveRawData);
-    };
+    // const handleDrawer = () => {
+    //     //setOpen(!open);
+    //     props.handleDrawerClick(!props.open);
+    // };    
 
     return (
         <div>
             <AppBar
                 position="fixed"
                 className={clsx(classes.appBar, {
-                    [classes.appBarSmall]: open,
-                    [classes.appBarBig]: !open,
+                    [classes.appBarSmall]: props.open,
+                    [classes.appBarBig]: !props.open,
                 })}>
                 <Toolbar>
                     <IconButton color="inherit"
                         aria-label="drawer handler"
-                        onClick={handleDrawer}
+                        onClick={() => props.handleDrawerClick(!props.open)}
                         edge="start"
                         className={classes.menuButton}>
-                        {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                        {props.open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                     </IconButton>
                     <Typography variant="h6" noWrap>
                         {props.route}
@@ -141,7 +137,7 @@ export default function Navigation(props: Readonly<{ route: any }>) {
                     <IconButton color="inherit"
                         edge="end"
                         className={classes.menuButtonEnd}
-                        onClick={handleRefresh}>
+                        onClick={() => console.log(`refresh clicked`)}>
                         <RefreshIcon />
                     </IconButton>
                 </Toolbar>
@@ -149,13 +145,13 @@ export default function Navigation(props: Readonly<{ route: any }>) {
             <Drawer
                 variant="permanent"
                 className={clsx(classes.drawer, {
-                    [classes.drawerOpen]: open,
-                    [classes.drawerClose]: !open,
+                    [classes.drawerOpen]: props.open,
+                    [classes.drawerClose]: !props.open,
                 })}
                 classes={{
                     paper: clsx(classes.drawerPaper, {
-                        [classes.drawerOpen]: open,
-                        [classes.drawerClose]: !open,
+                        [classes.drawerOpen]: props.open,
+                        [classes.drawerClose]: !props.open,
                     }),
                 }}
             >
@@ -218,3 +214,20 @@ export default function Navigation(props: Readonly<{ route: any }>) {
         </div>
     );
 }
+
+const mapStateToProps = (state: State) => (
+    {
+        open: state.UpdateApplicationState.DrawerOpen,
+        route: state.UpdateApplicationState.Route
+    });
+
+const mapDispatchToProps = (dispatch: Dispatch<OpenMainDrawerCommand>) => {
+    return {
+        handleDrawerClick: (open: boolean) => {
+            dispatch(ToggleDrawerOpenStatus(open));
+        }
+    }
+}
+
+const StatefulNavigation = connect(mapStateToProps, mapDispatchToProps)(Navigation);
+export default StatefulNavigation;
