@@ -10,10 +10,13 @@ import SettingsIcon from "./icons/SettingsIcon";
 import DownloadIcon from "./icons/DownloadIcon";
 import { CustomTheme } from "../theme/CustomTheme";
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import RefreshIcon from '@material-ui/icons/Refresh';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 import { RouteLogic } from "../App";
+import { ClientRequestHandler } from "../data/clientRequestHandler";
+import { ElectronResponse } from "src/main/models/app-api-payload";
 
 const theme = CustomTheme.Dark;
 const drawerOpenWidth = 200;
@@ -43,6 +46,9 @@ const localAppBarStyles = makeStyles((theme: Theme) =>
         },
         menuButton: {
             marginRight: theme.spacing(2),
+        },
+        menuButtonEnd: {
+            marginLeft: "Auto",
         },
         menuTypo: {
             lineHeight: theme.spacing(4) + "px",
@@ -95,7 +101,7 @@ const localAppBarStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export default function Navigation(props: Readonly<{route: any}>) {
+export default function Navigation(props: Readonly<{ route: any }>) {
     const classes = localAppBarStyles();
     const [open, setOpen] = React.useState(false);
 
@@ -103,6 +109,14 @@ export default function Navigation(props: Readonly<{route: any}>) {
 
     const handleDrawer = () => {
         setOpen(!open);
+    };
+
+    const receiveRawData = (response: ElectronResponse) => {
+
+    }
+
+    const handleRefresh = () => {
+        ClientRequestHandler.sendAsyncMessage(this.dataRequest, receiveRawData);
     };
 
     return (
@@ -124,6 +138,12 @@ export default function Navigation(props: Readonly<{route: any}>) {
                     <Typography variant="h6" noWrap>
                         {props.route}
                     </Typography>
+                    <IconButton color="inherit"
+                        edge="end"
+                        className={classes.menuButtonEnd}
+                        onClick={handleRefresh}>
+                        <RefreshIcon />
+                    </IconButton>
                 </Toolbar>
             </AppBar>
             <Drawer

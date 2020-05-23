@@ -4,8 +4,11 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import '../../public/index.scss';
 import { CustomTheme } from './theme/CustomTheme';
+import { ClientRequestHandler } from './data/clientRequestHandler';
 
 console.log('👋 This message is being logged by "renderer.tsx", included via webpack');
+
+ClientRequestHandler.initialise();
 
 ReactDOM.render(<App/>, document.getElementById('root'));
 
