@@ -1,7 +1,5 @@
 import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu } from "electron";
-import * as path from 'path';
-import * as url from 'url';
-import { MainApi } from "./main-api";
+import MainApi from "./main-api";
 import { Store } from "./storage/store";
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 
@@ -121,6 +119,7 @@ export default class Main {
     }
 
     static async start(app: Electron.App, browserWindow: typeof BrowserWindow) {
+        console.log(`starting application`);
         try {
             if (process.env.NODE_ENV !== 'production') {
                 await Main.installExtensions();

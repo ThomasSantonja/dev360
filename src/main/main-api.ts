@@ -13,7 +13,7 @@ export enum RefreshStrategy {
     force_remote
 }
 
-export class MainApi {
+export default class MainApi {
 
     registeredProviders: Dictionary<ApiContract>;
 
@@ -22,8 +22,8 @@ export class MainApi {
     constructor() {
         this.registeredProviders = new Dictionary<ApiContract>();
 
-        ipcMain.on('asynchronous-message', this.onAsyncMessageReceived);
-        ipcMain.on('synchronous-message', this.OnSyncMessageReceived);
+        ipcMain.on('asynchronous-message', this.onAsyncMessageReceived.bind(this));
+        ipcMain.on('synchronous-message', this.OnSyncMessageReceived.bind(this));
 
         this.registeredProviders.Insert(JiraApi.JIRA_PROVIDER, new JiraApi());
     }
@@ -32,12 +32,17 @@ export class MainApi {
         var req = arg as ElectronRequest;
         var resp: ElectronResponse = { originalRequest: req, response: undefined };
         if (!req) { resp.response = `unable to perform the command, reason: the request provided is null`; }
-
-        var provider = this.registeredProviders.Get(req.provider);
-        if (!provider) { resp.response = `unable to perform the command, reason: the contract named ${req.provider} is not registered`; }
-
+        var provider: ApiContract = {};
         try {
-            resp.response = await (provider.value as any)[req.contract](req.parameters);
+            provider = this.registeredProviders.Get(req.provider).value;
+            if (!provider) { resp.response = `unable to perform the command, reason: the contract named ${req.provider} is not registered`; }
+        } catch (error) {
+            resp.response = `unable to perform the command, reason: ${error}`;
+            event.reply(MainApi.ASYNC_REPLY, resp);
+            return;
+        }
+        try {
+            resp.response = await (provider as any)[req.contract](req.parameters);
         } catch (problem) {
             resp.response = `unable to perform the command ${req.provider}.${req.contract}, reason: ${problem}`;
         }

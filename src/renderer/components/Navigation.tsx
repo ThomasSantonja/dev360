@@ -14,12 +14,13 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
-import { RouteLogic } from "../App";
-import { ClientRequestHandler } from "../data/clientRequestHandler";
-import { ElectronResponse } from "src/main/models/app-api-payload";
+import { ElectronResponse, ElectronRequest } from "../../main/models/app-api-payload";
 import { State } from "../redux/store";
 import { OpenMainDrawerCommand, ToggleDrawerOpenStatus } from "../redux/viewModels/appViewModel";
 import { connect } from "react-redux";
+import { FetchData } from "../redux/viewModels/incidentsViewModel";
+import { RefreshStrategy } from "../../main/main-api";
+import { JiraApi } from "../../main/jira/jira-api";
 
 const theme = CustomTheme.Dark;
 const drawerOpenWidth = 200;
@@ -104,9 +105,15 @@ const localAppBarStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export function Navigation(props: Readonly<{ open?: boolean, route?: any, handleDrawerClick?: any }>) {
+export function Navigation(props: Readonly<{
+    open?: boolean,
+    route?: any,
+    handleDrawerClick?: any,
+    handleRefreshClick?: any,
+    isLoading?: boolean,
+    lastUpdate?: Date
+}>) {
     const classes = localAppBarStyles();
-    //const [open, setOpen] = React.useState(false);
 
     console.log(`navigation refresh props: ${props}`);
 
@@ -136,8 +143,9 @@ export function Navigation(props: Readonly<{ open?: boolean, route?: any, handle
                     </Typography>
                     <IconButton color="inherit"
                         edge="end"
+                        disabled={props.isLoading}
                         className={classes.menuButtonEnd}
-                        onClick={() => console.log(`refresh clicked`)}>
+                        onClick={() => props.handleRefreshClick(props.route)}>
                         <RefreshIcon />
                     </IconButton>
                 </Toolbar>
@@ -218,13 +226,33 @@ export function Navigation(props: Readonly<{ open?: boolean, route?: any, handle
 const mapStateToProps = (state: State) => (
     {
         open: state.UpdateApplicationState.DrawerOpen,
-        route: state.UpdateApplicationState.Route
+        route: state.UpdateApplicationState.Route,
+        isLoading: state.UpdateIncidentsState.isFetching,
+        lastUpdate: state.UpdateIncidentsState.lastUpdate
     });
 
-const mapDispatchToProps = (dispatch: Dispatch<OpenMainDrawerCommand>) => {
+
+
+//we build the request based on the state
+
+
+const mapDispatchToProps = (dispatch: Dispatch<any>) => {
     return {
         handleDrawerClick: (open: boolean) => {
             dispatch(ToggleDrawerOpenStatus(open));
+        },
+        handleRefreshClick: (route: string) => {
+            let request: ElectronRequest = { parameters: RefreshStrategy.force_remote } as ElectronRequest;
+            switch (route) {
+                case "Incidents":
+                    request.contract = JiraApi.INCIDENTS;
+                    request.provider = JiraApi.JIRA_PROVIDER;
+                    break;
+                default:
+                    console.log(`Unknown route, no action taken`);
+                    return;
+            };
+            dispatch(FetchData(request));
         }
     }
 }

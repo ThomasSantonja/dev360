@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
 import { Typography, makeStyles, createStyles, Grid, Paper, Theme } from "@material-ui/core";
+import { State } from "../redux/store";
+import { JiraModels } from "../../main/models/jira-models";
+import { connect } from "react-redux";
 
 const incidentStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -14,7 +17,7 @@ const incidentStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export default function IncidentsView(props: Readonly<any>) {
+export function IncidentsView(props: Readonly<{ payload: JiraModels.RootObject }>) {
 
     const classes = incidentStyles();
 
@@ -31,8 +34,8 @@ export default function IncidentsView(props: Readonly<any>) {
                     xl={3}
                     xs={12}
                 >
-                    Total Nb Incidents
-        </Grid>
+                    {props.payload?.issues?.length ?? 0}
+                </Grid>
                 <Grid
                     item
                     lg={3}
@@ -100,3 +103,12 @@ export default function IncidentsView(props: Readonly<any>) {
         </div>
     );
 }
+
+
+const mapStateToProps = (state: State) => (
+    {
+        payload: state.UpdateIncidentsState.payload
+    });
+
+const StatefulIncidentsView = connect(mapStateToProps, {})(IncidentsView);
+export default StatefulIncidentsView;

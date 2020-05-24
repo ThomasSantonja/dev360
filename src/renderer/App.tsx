@@ -2,7 +2,7 @@ import React, { useEffect, ReactElement, useState, Dispatch } from 'react';
 import { createStyles, makeStyles, Theme, ThemeProvider } from '@material-ui/core/styles';
 import { CssBaseline } from '@material-ui/core';
 import { CustomTheme } from './theme/CustomTheme';
-import IncidentsView from './views/Incidents';
+import StatefulIncidentsView from './views/Incidents';
 import { Switch, Route, MemoryRouter } from 'react-router-dom';
 import InProgressView from './views/InProgress';
 import { connect } from 'react-redux';
@@ -67,7 +67,7 @@ export function App(props: Readonly<{ route?: string, routeChangeHandler?: any }
                 <Route exact path='/incidents' render={
                   () => {
                     props.routeChangeHandler("Incidents");
-                    return (<IncidentsView />);
+                    return (<StatefulIncidentsView />);
                   }
                 } />
                 <Route render={

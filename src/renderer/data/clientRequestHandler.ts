@@ -4,8 +4,11 @@ import { ElectronResponse, ElectronRequest } from "../../main/models/app-api-pay
 import hash from "object-hash";
 
 export class ClientRequestHandler {
+
+    static initialised: boolean = false;
+
     constructor() {
-        ClientRequestHandler.initialise();
+        if (!ClientRequestHandler.initialised) { ClientRequestHandler.initialise(); }
     }
 
     static initialise() {
@@ -23,6 +26,7 @@ export class ClientRequestHandler {
                 ClientRequestHandler.callbackMap.Insert(hashed, callback);
             }
             ipcRenderer.send('asynchronous-message', message);
+            console.log(`succesfully sent the following request message`, message);
         }
         catch (problem) {
             console.log(`Error while sending the message ${message?.provider}.${message?.contract} to the application: ${problem}`);
@@ -46,3 +50,5 @@ export class ClientRequestHandler {
         cb.value(response);
     }
 }
+
+new ClientRequestHandler();

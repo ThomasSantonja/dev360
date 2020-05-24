@@ -11,7 +11,7 @@ export class JiraApi implements ApiContract {
     LocalStorage: Store;
 
     static JIRA_PROVIDER: string = "JIRA";
-    static INCIDENTS: string = "INCIDENTS";
+    static INCIDENTS: string = "getIncidents";
 
     constructor() {
         this.LocalStorage = new Store(JiraApi.JIRA_PROVIDER);
