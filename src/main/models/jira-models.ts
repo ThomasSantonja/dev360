@@ -1,3 +1,5 @@
+import { TimeSpan } from "../utils/timespan";
+
 export module JiraModels {
 
     export interface Type {
@@ -141,35 +143,11 @@ export module JiraModels {
         content: Content[];
     }   
 
-    export interface Customfield14867 {
-        version: number;
-        type: string;
-        content: Content[];
-    }
-
     export interface Watches {
         self: string;
         watchCount: number;
         isWatching: boolean;
-    }
-
-    export interface Customfield14982 {
-        version: number;
-        type: string;
-        content: Content[];
-    }    
-
-    export interface Customfield14983 {
-        version: number;
-        type: string;
-        content: Content[];
-    }
-
-    export interface Customfield14981 {
-        version: number;
-        type: string;
-        content: Content[];
-    }
+    }  
 
     export interface Description {
         version: number;
@@ -177,56 +155,20 @@ export module JiraModels {
         content: Content[];
     }
 
-    export interface Customfield14967 {
-        self: string;
-        accountId: string;
-        avatarUrls: any;
-        displayName: string;
-        active: boolean;
-        timeZone: string;
-        accountType: string;
-    }
-
     export interface I18nErrorMessage {
         i18nKey: string;
         parameters: any[];
     }
 
-    export interface Customfield11204 {
+    export interface I18nErrorMessageText {
         errorMessage: string;
         i18nErrorMessage: I18nErrorMessage;
     }
 
-    export interface Customfield11205 {
-        errorMessage: string;
-        i18nErrorMessage: I18nErrorMessage;
-    }
-
-    export interface Customfield14838 {
+    export interface CustomValue {
         self: string;
         value: string;
         id: string;
-    }
-
-    export interface Customfield14821 {
-        self: string;
-        value: string;
-        id: string;
-    }
-
-    export interface Status2 {
-        self: string;
-        description: string;
-        iconUrl: string;
-        name: string;
-        id: string;
-        statusCategory: StatusCategory;
-    }
-
-    export interface Customfield14932 {
-        version: number;
-        type: string;
-        content: Content[];
     }
    
     export interface Creator {
@@ -244,37 +186,13 @@ export module JiraModels {
         progress: number;
         total: number;
     }
-
-    export interface Customfield13711 {
-        self: string;
-        value: string;
-        id: string;
-    }
-
-    export interface Customfield10201 {
-        self: string;
-        value: string;
-        id: string;
-    }
-
-    export interface Customfield11405 {
-        version: number;
-        type: string;
-        content: Content[];
-    }
-
+    
     export interface Customfield13000 {
         hasEpicLinkFieldDependency: boolean;
         showField: boolean;
         nonEditableReason: NonEditableReason;
     }
-
-    export interface Customfield14852 {
-        version: number;
-        type: string;
-        content: Content[];
-    }
-
+    
     export interface Fields {
         customfield_13100: string;
         resolution?: any;
@@ -320,7 +238,7 @@ export module JiraModels {
         project: Project;
         customfield_14870?: any;
         customfield_13300?: any;
-        customfield_14871?: any;
+        customfield_14871?: Date;
         customfield_11001?: any;
         customfield_14876?: any;
         customfield_11003?: any;
@@ -331,22 +249,22 @@ export module JiraModels {
         customfield_12205?: any;
         customfield_10700?: any;
         customfield_12208?: any;
-        customfield_14867: Customfield14867;
+        customfield_14867: Description;
         customfield_12207?: any;
         customfield_10701?: any;
         customfield_10702?: any;
         customfield_10703?: any;
         customfield_10704?: any;
-        resolutiondate?: any;
+        resolutiondate?: Date;
         customfield_10705?: any;
         watches: Watches;
         customfield_14861?: any;
-        customfield_14982: Customfield14982;
-        customfield_14983: Customfield14983;
+        customfield_14982: Description;
+        customfield_14983: Description;
         customfield_14862?: any;
         customfield_14980?: any;
         customfield_12200?: any;
-        customfield_14981: Customfield14981;
+        customfield_14981: Description;
         customfield_14860?: any;
         customfield_12202?: any;
         customfield_14986?: any;
@@ -360,7 +278,7 @@ export module JiraModels {
         customfield_12203?: any;
         customfield_14979?: any;
         customfield_14859?: any;
-        customfield_14977?: any;
+        customfield_14977?: Date;
         customfield_11900?: any;
         customfield_14856?: any;
         customfield_14978?: any;
@@ -378,14 +296,14 @@ export module JiraModels {
         customfield_14855?: any;
         customfield_13400?: any;
         customfield_14976: Date;
-        customfield_14852: Customfield14852;
+        customfield_14852: Description;
         customfield_14853?: any;
         customfield_14974?: any;
         customfield_14969?: any;
         customfield_14848?: any;
         customfield_14966?: any;
         customfield_10007: string[];
-        customfield_14967: Customfield14967[];
+        customfield_14967: Assignee[];
         customfield_10008?: any;
         customfield_14846?: any;
         customfield_10800?: any;
@@ -410,14 +328,14 @@ export module JiraModels {
         customfield_14963?: any;
         customfield_14842?: any;
         customfield_14836?: any;
-        customfield_11204: Customfield11204;
-        customfield_11205: Customfield11205;
+        customfield_11204: I18nErrorMessageText;
+        customfield_11205: I18nErrorMessageText;
         customfield_14837?: any;
         environment?: any;
         customfield_14834?: any;
         customfield_14835?: any;
         duedate?: any;
-        customfield_14838: Customfield14838;
+        customfield_14838: CustomValue;
         customfield_14839?: any;
         statuscategorychangedate: Date;
         customfield_14950?: any;
@@ -457,7 +375,7 @@ export module JiraModels {
         customfield_12400?: any;
         customfield_11310?: any;
         priority: Priority;
-        customfield_14821: Customfield14821;
+        customfield_14821: CustomValue;
         customfield_11311?: any;
         customfield_14943?: any;
         customfield_14822?: any;
@@ -483,11 +401,11 @@ export module JiraModels {
         customfield_11309?: any;
         customfield_14817?: any;
         customfield_14938?: any;
-        status: Status2;
+        status: Status;
         customfield_14810?: any;
         customfield_14811?: any;
         customfield_11300?: any;
-        customfield_14932: Customfield14932;
+        customfield_14932: Description;
         customfield_11301?: any;
         customfield_11302?: any;
         customfield_14803?: any;
@@ -504,12 +422,12 @@ export module JiraModels {
         customfield_14001?: any;
         aggregateprogress: Aggregateprogress;
         customfield_14800?: any;
-        customfield_13711: Customfield13711;
-        customfield_10201: Customfield10201;
+        customfield_13711: CustomValue;
+        customfield_10201: CustomValue;
         customfield_13710?: any;
         customfield_11524?: any;
         customfield_11523?: any;
-        customfield_11405: Customfield11405;
+        customfield_11405: Description;
         customfield_11525?: any;
         customfield_13703?: any;
         customfield_13705?: any;
@@ -554,6 +472,10 @@ export module JiraModels {
         customfield_11605?: any;
         customfield_11604?: any;
         customfield_11606?: any;
+        timeToDetection?: TimeSpan;
+        timeToFix?: TimeSpan;
+        timeToResolution?: TimeSpan;
+        timeToClosure?: TimeSpan;
     }
 
     export interface Issue {
