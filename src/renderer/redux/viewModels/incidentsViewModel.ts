@@ -65,7 +65,7 @@ export function UpdateIncidentsState(state: IncidentsState = defaultIncidentsSta
         case IncidentsCommands.FETCH_DATA_SUCCESS:
             var fetchSuccessAction = action as FetchDataSuccessCommand;
             if (!fetchSuccessAction) {
-                console.log(`wrong parameter reveived as the command for successful fetch`);
+                console.error(`wrong parameter reveived as the command for successful fetch`);
             }
             var increase = (fetchSuccessAction.payload?.total ?? 0) - (state.payload?.total ?? 0);
             return Object.assign<{}, IncidentsState, IncidentsState>(
@@ -114,7 +114,7 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
             issue.fields.customfield_14871 = new Date(issue.fields.customfield_14871);
         }
         if (issue.fields.customfield_14976 && issue.fields.customfield_14871) {
-            issue.fields.timeToDetection = TimeSpan.Subtract(issue.fields.customfield_14976, issue.fields.customfield_14871) ?? undefined;
+            issue.fields.timeToDetection = TimeSpan.Subtract(issue.fields.customfield_14871, issue.fields.customfield_14976) ?? undefined;
             totalDetection += issue.fields.timeToDetection?.totalMilliSeconds ?? 0;
         }
         if (issue.fields.customfield_14976 && issue.fields.customfield_14977) {
@@ -173,7 +173,7 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
 }
 
 export function FetchData(request: ElectronRequest) {
-    console.log(`attempting to fetch data for ${request?.provider}.${request?.contract}`);
+    console.info(`attempting to fetch data for ${request?.provider}.${request?.contract}`);
     return function (dispatch: Dispatch<any>) {
         // First dispatch: the app state is updated to inform
         // that the API call is starting.  

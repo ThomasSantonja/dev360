@@ -3,6 +3,7 @@ import React from "react";
 import { JiraModels } from "src/main/models/jira-models";
 import dateFormat from "dateformat";
 import humanizeDuration from "humanize-duration";
+import IncidentsTimeline from "./IncidentTimeline";
 
 const StyledTableCell = withStyles((theme: Theme) =>
     createStyles({
@@ -11,7 +12,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
         },
         body: {
             fontSize: "0.875rem",
-        },
+        }
     }),
 )(TableCell);
 
@@ -32,6 +33,9 @@ const incidentTableStyles = makeStyles((theme: Theme) =>
         },
         root: {
             width: "100%"
+        },
+        timeline:{
+            minWidth: "300px"
         }
     }));
 
@@ -81,12 +85,7 @@ export default function JiraIncidentsTable(props: { data: Array<JiraModels.Issue
                             <StyledTableCell align="left">Assignee</StyledTableCell>
                             <StyledTableCell align="left">Root Cause</StyledTableCell>
                             <StyledTableCell align="right">Services</StyledTableCell>
-                            <StyledTableCell align="left">Intro. Date</StyledTableCell>
-                            <StyledTableCell align="left">Detec. Date</StyledTableCell>
-                            <StyledTableCell align="left">Detec. Time</StyledTableCell>
-                            <StyledTableCell align="left">Resol. Date</StyledTableCell>
-                            <StyledTableCell align="left">Resol. Time</StyledTableCell>
-                            <StyledTableCell align="left">Closure Date</StyledTableCell>
+                            <StyledTableCell align="center" className={classes.timeline}>Timeline</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -100,12 +99,7 @@ export default function JiraIncidentsTable(props: { data: Array<JiraModels.Issue
                                     <TableCell align="left">{row.fields?.assignee?.displayName ?? NONE_VALUE}</TableCell>
                                     <TableCell align="left">{row.fields?.customfield_14918?.value ?? NONE_VALUE}</TableCell>
                                     <TableCell align="right">{row.fields?.customfield_14971?.length ?? NONE_VALUE}</TableCell>
-                                    <TableCell align="left">{row.fields?.customfield_14871 == undefined ? NONE_VALUE : dateFormat(row.fields.customfield_14871, "yyyy-mm-dd HH:MM:ss")}</TableCell>
-                                    <TableCell align="left">{row.fields?.customfield_14976 == undefined ? NONE_VALUE : dateFormat(row.fields.customfield_14976, "yyyy-mm-dd HH:MM:ss")}</TableCell>
-                                    <TableCell align="left">{row.fields?.timeToDetection == undefined ? NONE_VALUE : humanizeDuration(row.fields.timeToDetection.totalMilliSeconds, { largest: 1, maxDecimalPoints: 1 })}</TableCell>
-                                    <TableCell align="left">{row.fields?.customfield_14977 == undefined ? NONE_VALUE : dateFormat(row.fields.customfield_14977, "yyyy-mm-dd HH:MM:ss")}</TableCell>
-                                    <TableCell align="left">{row.fields?.timeToResolution == undefined ? NONE_VALUE : humanizeDuration(row.fields.timeToResolution.totalMilliSeconds, { largest: 1, maxDecimalPoints: 1 })}</TableCell>
-                                    <TableCell align="left">{row.fields?.resolutiondate == undefined ? NONE_VALUE : dateFormat(row.fields.resolutiondate, "yyyy-mm-dd HH:MM:ss")}</TableCell>
+                                    <TableCell align="center" className={classes.timeline}><IncidentsTimeline incident={row} /></TableCell>
                                 </StyledTableRow>
                             ))
                         }
@@ -115,7 +109,7 @@ export default function JiraIncidentsTable(props: { data: Array<JiraModels.Issue
             <TablePagination
                 rowsPerPageOptions={[10, 25, 100]}
                 component="div"
-                count={props.data?.length}
+                count={props.data?.length ?? 0}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onChangePage={handleChangePage}

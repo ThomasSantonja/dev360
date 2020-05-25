@@ -20,6 +20,9 @@ const incidentStyles = makeStyles((theme: Theme) =>
             textAlign: 'center',
             color: theme.palette.text.secondary,
         },
+        fullWidth: {
+            width: "100%"
+        }
     }),
 );
 
@@ -27,9 +30,10 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
 
     const classes = incidentStyles();
     const [loaded, setLoaded] = React.useState(false);
+    console.log(`rendering incidents, dataset is:`, props.incidents);
 
     if (!loaded) {
-        console.log(`data not loaded, loading it from 0`);
+        console.log(`data not loaded, trying to request it from local cache`);
         setLoaded(true);
         props.getData();
     }
@@ -121,10 +125,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                 >
                     <Card>Status</Card>
                 </Grid>
-                <Grid
-                    item
-                    xl={12}
-                >
+                <Grid item className={classes.fullWidth}>
                     <DataTable data={props.incidents?.payload?.issues} />
                 </Grid>
             </Grid>

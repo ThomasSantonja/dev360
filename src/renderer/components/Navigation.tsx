@@ -115,13 +115,6 @@ export function Navigation(props: Readonly<{
 }>) {
     const classes = localAppBarStyles();
 
-    console.log(`navigation refresh props: ${props}`);
-
-    // const handleDrawer = () => {
-    //     //setOpen(!open);
-    //     props.handleDrawerClick(!props.open);
-    // };    
-
     return (
         <div>
             <AppBar
@@ -249,7 +242,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>) => {
                     request.provider = JiraApi.JIRA_PROVIDER;
                     break;
                 default:
-                    console.log(`Unknown route, no action taken`);
+                    console.warn(`Unknown route ${route}, no action taken`);
                     return;
             };
             dispatch(FetchData(request));

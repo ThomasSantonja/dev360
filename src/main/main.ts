@@ -119,7 +119,7 @@ export default class Main {
     }
 
     static async start(app: Electron.App, browserWindow: typeof BrowserWindow) {
-        console.log(`starting application`);
+        console.info(`starting the main application`);
         try {
             if (process.env.NODE_ENV !== 'production') {
                 await Main.installExtensions();

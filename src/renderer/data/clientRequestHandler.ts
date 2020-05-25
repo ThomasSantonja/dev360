@@ -26,27 +26,27 @@ export class ClientRequestHandler {
                 ClientRequestHandler.callbackMap.Insert(hashed, callback);
             }
             ipcRenderer.send('asynchronous-message', message);
-            console.log(`succesfully sent the following request message`, message);
+            console.info(`succesfully sent the following request message`, message);
         }
         catch (problem) {
-            console.log(`Error while sending the message ${message?.provider}.${message?.contract} to the application: ${problem}`);
+            console.error(`Error while sending the message ${message?.provider}.${message?.contract} to the application: ${problem}`);
         }
     }
 
     static onAsynchronousReply(event: IpcRendererEvent, arg: any) {
-        console.log("receiving reply from main thread");
 
         let response = arg as ElectronResponse;
-        console.log(`the response is ${response.response}`);
+
         if (!response) {
+            console.warn(`received a response from a request but the response is not of the correct type:`, arg)
             return;
         }
         var cb = ClientRequestHandler.callbackMap.Get(response.originalRequest?.callback);
         if (!cb) {
-            console.log(`the callback identified ${response.originalRequest?.callback} could not be found`);
+            console.error(`the callback identified ${response.originalRequest?.callback} could not be found`);
             return;
         }
-        console.log(`calling original message callback ${response.originalRequest.callback}`);
+        
         cb.value(response);
     }
 }

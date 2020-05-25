@@ -34,6 +34,8 @@ export class TimeSpan {
     }
 
     constructor(milliSeconds: number = 0) {
+        this._milliseconds = 0;
+        this._totalMilliSeconds = 0;
         this._seconds = 0;
         this._minutes = 0;
         this._hours = 0;
@@ -118,7 +120,6 @@ export class TimeSpan {
     }
 
     addTo(date: Date): Date {
-        console.log('add ' + this.totalMilliSeconds, this);
         date.setMilliseconds(date.getMilliseconds() + this.totalMilliSeconds);
 
         return date;
@@ -156,6 +157,9 @@ export class TimeSpan {
             + this.seconds * MILLISECONDS_IN_A_SECOND + this.milliseconds;
     }
 
-
+    toString(): string {
+        if (!this) { return ""; }
+        return `${this._days} day${this._days > 1 ? "s" : ""} ${this._hours}:${this._minutes}:${this._seconds}.${this.milliseconds}`;
+    }
 
 }

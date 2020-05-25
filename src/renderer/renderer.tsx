@@ -8,8 +8,6 @@ import { ClientRequestHandler } from './data/clientRequestHandler';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
 
-console.log('👋 This message is being logged by "renderer.tsx", included via webpack');
-
 ClientRequestHandler.initialise();
 
 ReactDOM.render(

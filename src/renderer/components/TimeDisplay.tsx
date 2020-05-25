@@ -55,13 +55,6 @@ export default function TimeDisplay(props: Readonly<any>) {
     const classes = useStyles();
     const [selectedTime, setSelectedTime] = React.useState(timeExplanation[0].title);
     const [selectedExplanation, setSelectedExplanation] = React.useState(timeExplanation[0].explanation);
-    const [actualValue, setValue] = React.useState<number>(
-        timeTotal
-            ? (average
-                ? timeTotal[timeExplanation[0].fieldName].totalMilliSeconds / timeTotal.issues.length
-                : timeTotal[timeExplanation[0].fieldName].totalMilliSeconds
-            )
-            : 0);
 
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -73,12 +66,7 @@ export default function TimeDisplay(props: Readonly<any>) {
         setAnchorEl(null);
         if (index >= 0 && index < timeExplanation.length && timeTotal) {
             setSelectedTime(timeExplanation[index].title);
-            setSelectedExplanation(timeExplanation[index].explanation);
-            var calcul = timeTotal[timeExplanation[index].fieldName].totalMilliSeconds;
-            if (average) {
-                calcul /= timeTotal.issues.length;
-            }
-            setValue(calcul);
+            setSelectedExplanation(timeExplanation[index].explanation);            
         }
     };
 
@@ -94,7 +82,12 @@ export default function TimeDisplay(props: Readonly<any>) {
                                 variant="body2">{selectedType} of {selectedTime}</Typography>
                         </Tooltip>
                         <Typography variant="h4">{
-                            humanizeDuration(actualValue, { largest: 2, maxDecimalPoints: 1 })
+                            humanizeDuration(timeTotal
+                                ? (average
+                                    ? timeTotal[timeExplanation[0].fieldName].totalMilliSeconds / timeTotal.issues.length
+                                    : timeTotal[timeExplanation[0].fieldName].totalMilliSeconds
+                                )
+                                : 0, { largest: 2, maxDecimalPoints: 1 })
                         }
                         </Typography>
                     </div>
