@@ -2,6 +2,7 @@ import { makeStyles, Card, CardContent, Grid, Typography, Tooltip, Chip } from "
 import React from "react";
 import clsx from 'clsx';
 import IncidentsIcon from "./icons/IncidentsIcon";
+import { COLORS_PASTEL } from "../consts";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -50,7 +51,7 @@ const useStyles = makeStyles(theme => ({
     differenceValue: {
         marginRight: theme.spacing(2),
         marginLeft: theme.spacing(2),
-        backgroundColor: "rgba(0,0,100,0.2)"
+        backgroundColor: COLORS_PASTEL[0]
     },
     differenceNegative: {
         backgroundColor: "rgba(100,0,0,0.2)"

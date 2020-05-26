@@ -101,7 +101,7 @@ export module JiraModels {
         votes: number;
         hasVoted: boolean;
     }
-   
+
     export interface ProjectCategory {
         self: string;
         id: string;
@@ -141,13 +141,13 @@ export module JiraModels {
         marks: Mark[];
         attrs: Attrs;
         content: Content[];
-    }   
+    }
 
     export interface Watches {
         self: string;
         watchCount: number;
         isWatching: boolean;
-    }  
+    }
 
     export interface Description {
         version: number;
@@ -170,7 +170,7 @@ export module JiraModels {
         value: string;
         id: string;
     }
-   
+
     export interface Creator {
         self: string;
         accountId: string;
@@ -186,7 +186,7 @@ export module JiraModels {
         progress: number;
         total: number;
     }
-    
+
     export interface Fields {
         customfield_13100: string;
         resolution?: any;
@@ -280,7 +280,7 @@ export module JiraModels {
         updated: Date;
         timeoriginalestimate?: any;
         customfield_14850?: any;
-        customfield_14971?: CustomValue;
+        customfield_14971?: CustomValue[];
         customfield_14972?: any;
         customfield_14851?: any;
         description: Description;

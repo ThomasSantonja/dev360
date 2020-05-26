@@ -19,6 +19,7 @@ import { TimeSpan } from "../../main/utils/timespan";
 import humanizeDuration from "humanize-duration";
 import dateFormat from "dateformat";
 import HtmlTooltip from "./HtmlTooltip";
+import { COLORS_PASTEL } from "../consts";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -31,11 +32,10 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-
 const ValidEntry = withStyles((theme: Theme) =>
     createStyles({
         root: {
-            color: theme.palette.success.dark
+            color: COLORS_PASTEL[4]
         },
     }),
 )(CheckCircleOutlineIcon);
@@ -43,7 +43,7 @@ const ValidEntry = withStyles((theme: Theme) =>
 const EmptyEntry = withStyles((theme: Theme) =>
     createStyles({
         root: {
-            color: theme.palette.error.dark
+            color: COLORS_PASTEL[9]
         },
     }),
 )(HighlightOffIcon);
@@ -51,7 +51,7 @@ const EmptyEntry = withStyles((theme: Theme) =>
 const ValidDuration = withStyles((theme: Theme) =>
     createStyles({
         root: {
-            color: theme.palette.success.dark
+            color: COLORS_PASTEL[4]
         },
     }),
 )(PlayCircleOutlineIcon);
@@ -59,7 +59,7 @@ const ValidDuration = withStyles((theme: Theme) =>
 const EmptyDuration = withStyles((theme: Theme) =>
     createStyles({
         root: {
-            color: theme.palette.error.dark
+            color: COLORS_PASTEL[9]
         },
     }),
 )(PauseCircleOutlineIcon);

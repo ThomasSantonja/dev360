@@ -13,7 +13,8 @@ const legendStyles = makeStyles((theme: Theme) =>
             display: "flex"
         },
         legendContent: {
-            margin: theme.spacing(0.25)
+            margin: theme.spacing(0.25),
+            borderWidth: 0
         }
     }),
 );

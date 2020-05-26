@@ -51,8 +51,7 @@ export default function TimeDisplay(props: Readonly<any>) {
     const { className, timeTotal, timeFiltered, average, selectedType, ...rest } = props;
 
     const classes = useStyles();
-    const [selectedTime, setSelectedTime] = React.useState(timeExplanation[0].title);
-    const [selectedExplanation, setSelectedExplanation] = React.useState(timeExplanation[0].explanation);
+    const [index, setIndex] = React.useState(0);
 
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -63,8 +62,7 @@ export default function TimeDisplay(props: Readonly<any>) {
     const handleClose = (index: number) => {
         setAnchorEl(null);
         if (index >= 0 && index < timeExplanation.length && timeTotal) {
-            setSelectedTime(timeExplanation[index].title);
-            setSelectedExplanation(timeExplanation[index].explanation);            
+            setIndex(index);         
         }
     };
 
@@ -73,17 +71,17 @@ export default function TimeDisplay(props: Readonly<any>) {
             <CardContent className={classes.cardRoot}>
                 <div className={classes.root}>
                     <div className={classes.data}>
-                        <Tooltip title={selectedExplanation}>
+                        <Tooltip title={timeExplanation[index].explanation}>
                             <Typography className={classes.title}
                                 color="textSecondary"
                                 gutterBottom
-                                variant="body2">{selectedType} of {selectedTime}</Typography>
+                                variant="body2">{selectedType} of {timeExplanation[index].title}</Typography>
                         </Tooltip>
                         <Typography variant="h4">{
                             humanizeDuration(timeTotal
                                 ? (average
-                                    ? timeTotal[timeExplanation[0].fieldName].totalMilliSeconds / timeTotal.issues.length
-                                    : timeTotal[timeExplanation[0].fieldName].totalMilliSeconds
+                                    ? timeTotal[timeExplanation[index].fieldName].totalMilliSeconds / timeTotal.issues.length
+                                    : timeTotal[timeExplanation[index].fieldName].totalMilliSeconds
                                 )
                                 : 0, { largest: 2, maxDecimalPoints: 1 })
                         }

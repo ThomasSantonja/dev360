@@ -33,6 +33,8 @@ export interface JiraIncidentRootObject extends JiraModels.RootObject {
     rootCauses: NvpArray;
     statuses: NvpArray;
     teams: NvpArray;
+    services: NvpArray;
+    severities: NvpArray
 }
 
 export interface FetchDataCommand extends Command {
@@ -105,7 +107,21 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
     var totalClosure = 0;
 
     var rootCauses = new NvpArray();
-    var statuses = new NvpArray();
+    var statuses = new NvpArray(); //special sort, by order of the steps
+    statuses.AddToValue("Blocked", 0);
+    statuses.AddToValue("To Do", 0);
+    statuses.AddToValue("Investigation", 0);
+    statuses.AddToValue("Post Mortem Analysis", 0);
+    statuses.AddToValue("Follow up", 0);
+    statuses.AddToValue("Done", 0);
+    statuses.AddToValue("Archive", 0);
+    
+    var services = new NvpArray();
+    var severities = new NvpArray(); //special sort, and custom not coded, so starting this way
+    severities.AddToValue("Critical", 0);
+    severities.AddToValue("Major", 0);
+    severities.AddToValue("Minor", 0);
+    severities.AddToValue("Trivial", 0);
     var teams = new NvpArray();
 
     for (let issue of payload.issues) {
@@ -152,6 +168,8 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
         rootCauses.AddToValue(issue.fields?.customfield_14918?.value ?? NONE_TEXT, 1);
         //status
         statuses.AddToValue(issue.fields?.status?.name ?? NONE_TEXT, 1);
+        //severities = customfield_10201
+        severities.AddToValue(issue.fields?.customfield_10201?.value ?? NONE_TEXT, 1);
         //teams are harder, we have a list of linked caused for the incident
         if ((issue.fields.issuelinks?.length ?? 0) === 0) {
             teams.AddToValue(NONE_TEXT, 1);
@@ -160,6 +178,14 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
                 if (link?.type?.inward == "is caused by" && link.inwardIssue) {
                     teams.AddToValue(link.inwardIssue?.fields?.project?.name ?? NONE_TEXT, 1);
                 }
+            }
+        }
+        //services are also an array = customfield_14971
+        if ((issue.fields?.customfield_14971?.length ?? 0) === 0) {
+            services.AddToValue(NONE_TEXT, 1);
+        } else {
+            for (var service of issue.fields.customfield_14971 ?? []) {
+                services.AddToValue(service?.value ?? NONE_TEXT, 1);
             }
         }
 
@@ -198,8 +224,10 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
     }
 
     rootCauses.SortValues();
-    statuses.SortValues();
+    //statuses.SortValues();
     teams.SortValues();
+    services.SortValues();
+    //severities.SortValues();
 
     return {
         ...payload,
@@ -209,7 +237,9 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
         totalClosure: new TimeSpan(totalClosure),
         rootCauses,
         statuses,
-        teams
+        teams,
+        services,
+        severities
     };
 }
 

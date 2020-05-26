@@ -9,17 +9,25 @@ import { FetchData, IncidentsState } from "../redux/viewModels/incidentsViewMode
 import DataTable from "../components/JiraIncidentsTable";
 import TotalFilterNumbers from "../components/TotalFilterNumbers";
 import TimeDisplay from "../components/TimeDisplay";
-import { LineChart, Line, PieChart, Tooltip as ChartTooltip, Pie, Legend, Cell, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, PieChart, Tooltip as ChartTooltip, Pie, Legend, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LabelList } from 'recharts';
 import CoolPieChart from "../components/CoolPieChart";
 import { COLORS_PASTEL } from "../consts";
 import StandardPieChart from "../components/StandardPieChart";
 import { NameValuePair } from "src/main/utils/nvp-array";
-import ChartLegend from "../components/chartLegend";
+import ChartLegend from "../components/ChartLegend";
+import VerticalBarChart from "../components/VerticalBarChart";
 
 const incidentStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             flexGrow: 1,
+        },
+        chartCardsContainer: {
+            alignItems: "stretch"
+        },
+        chartCard: {
+            // height: "100%",
+            // maxHeight: "500px"
         },
         paper: {
             padding: theme.spacing(2),
@@ -36,6 +44,8 @@ const incidentStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+const chartMinHeight = "280px";
+
 export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getData: () => void, hasLoaded: boolean }>) {
 
     const classes = incidentStyles();
@@ -51,10 +61,13 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
     const teams = props.incidents?.payload?.teams?.ToArray();
     const rootCauses = props.incidents?.payload?.rootCauses?.ToArray();
     const statuses = props.incidents?.payload?.statuses?.ToArray();
+    const services = props.incidents?.payload?.services?.ToArray();
+    const severities = props.incidents?.payload?.severities?.ToArray();
 
     return (
         <div className={classes.root}>
             <Grid
+                className={classes.chartCardsContainer}
                 container
                 spacing={4}
             >
@@ -92,7 +105,8 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={9}
                     xs={12}
                 >
-                    <Card>
+                    <Card
+                        className={classes.chartCard}>
                         <Typography className={classes.title}
                             color="textSecondary"
                             gutterBottom
@@ -107,15 +121,16 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card>
+                    <Card
+                        className={classes.chartCard}>
                         <Typography className={classes.title}
                             color="textSecondary"
                             gutterBottom
                             variant="body2">Teams
                         </Typography>
-                        <ChartLegend data={teams}/>
+                        <ChartLegend data={teams} />
                         <StandardPieChart
-                            minHeight="300px"
+                            minHeight={chartMinHeight}
                             data={teams} />
                     </Card>
                 </Grid>
@@ -126,15 +141,16 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card>
+                    <Card
+                        className={classes.chartCard}>
                         <Typography className={classes.title}
                             color="textSecondary"
                             gutterBottom
                             variant="body2">Root causes
                         </Typography>
-                        <ChartLegend data={rootCauses}/>
+                        <ChartLegend data={rootCauses} />
                         <StandardPieChart
-                            minHeight="300px"
+                            minHeight={chartMinHeight}
                             data={rootCauses} />
                     </Card>
                 </Grid>
@@ -151,6 +167,9 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                             gutterBottom
                             variant="body2">Services
                         </Typography>
+                        <StandardPieChart
+                            minHeight={chartMinHeight}
+                            data={services} />
                     </Card>
                 </Grid>
                 <Grid
@@ -160,12 +179,14 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card>
+                    <Card
+                        className={classes.chartCard}>
                         <Typography className={classes.title}
                             color="textSecondary"
                             gutterBottom
                             variant="body2">Severities
                         </Typography>
+                        <VerticalBarChart data={severities}  className={classes.title} minHeight={300} />
                     </Card>
                 </Grid>
                 <Grid
@@ -175,16 +196,14 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card>
+                    <Card
+                        className={classes.chartCard}>
                         <Typography className={classes.title}
                             color="textSecondary"
                             gutterBottom
                             variant="body2">Statuses
-                        </Typography>
-                        <ChartLegend data={statuses}/>
-                        <StandardPieChart
-                            minHeight="300px"
-                            data={statuses} />
+                        </Typography>                        
+                        <VerticalBarChart data={statuses}  className={classes.title} minHeight={300} />
                     </Card>
                 </Grid>
                 <Grid item className={classes.fullWidth}>
