@@ -2,8 +2,6 @@ import { makeStyles, Card, CardContent, Grid, Typography, Tooltip, Chip, FormCon
 import React from "react";
 import clsx from 'clsx';
 import { MoreVert } from '@material-ui/icons';
-import { JiraModels } from "../../main/models/jira-models";
-import { TimeSpan } from "../../main/utils/timespan";
 import humanizeDuration from "humanize-duration";
 
 const useStyles = makeStyles(theme => ({
@@ -101,10 +99,10 @@ export default function TimeDisplay(props: Readonly<any>) {
                         open={Boolean(anchorEl)}
                         onClose={handleClose}
                     >
-                        <MenuItem onClick={() => handleClose(0)}>Time to detection</MenuItem>
-                        <MenuItem onClick={() => handleClose(1)}>Time to fix</MenuItem>
-                        <MenuItem onClick={() => handleClose(2)}>Time to resolution</MenuItem>
-                        <MenuItem onClick={() => handleClose(3)}>Time to closure</MenuItem>
+                        <MenuItem key={0} onClick={() => handleClose(0)}>Time to detection</MenuItem>
+                        <MenuItem key={1} onClick={() => handleClose(1)}>Time to fix</MenuItem>
+                        <MenuItem key={2} onClick={() => handleClose(2)}>Time to resolution</MenuItem>
+                        <MenuItem key={3} onClick={() => handleClose(3)}>Time to closure</MenuItem>
                     </Menu>
                 </div>
             </CardContent>

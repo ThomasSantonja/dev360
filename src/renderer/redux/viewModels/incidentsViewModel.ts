@@ -5,6 +5,7 @@ import { ElectronRequest, ElectronResponse } from "../../../main/models/app-api-
 import { Dispatch } from "react";
 import { ClientRequestHandler } from "../../../renderer/data/clientRequestHandler";
 import { TimeSpan } from "../../../main/utils/timespan";
+import { NvpArray } from "../../../main/utils/nvp-array";
 
 export interface IncidentsState {
     payload: JiraIncidentRootObject;
@@ -13,7 +14,7 @@ export interface IncidentsState {
     hasFetched: boolean;
     lastUpdate?: Date;
     increasedPayload: number;
-}
+};
 
 const defaultIncidentsState: IncidentsState = {
     payload: null as unknown as JiraIncidentRootObject,
@@ -28,6 +29,10 @@ export interface JiraIncidentRootObject extends JiraModels.RootObject {
     totalFix: TimeSpan;
     totalResolution: TimeSpan;
     totalClosure: TimeSpan;
+    //the chart dedicated pre formatted data: {name:string, value:string} as a default
+    rootCauses: NvpArray;
+    statuses: NvpArray;
+    teams: NvpArray;
 }
 
 export interface FetchDataCommand extends Command {
@@ -44,6 +49,9 @@ export enum IncidentsCommands {
     FETCH_DATA_FAILURE = 'FETCH_DATA_FAILURE',
     FETCH_DATA_SUCCESS = 'FETCH_DATA_SUCCES',
 }
+
+const NONE_TEXT = "None";
+const EXTERNAL_REASON = "External reason";
 
 export function FetchDataStart(dataAccess: RefreshStrategy): FetchDataCommand {
     return { type: IncidentsCommands.FETCH_DATA, dataAccess };
@@ -96,6 +104,10 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
     var totalResolution = 0;
     var totalClosure = 0;
 
+    var rootCauses = new NvpArray();
+    var statuses = new NvpArray();
+    var teams = new NvpArray();
+
     for (let issue of payload.issues) {
         if (!issue) {
             continue;
@@ -129,6 +141,28 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
             issue.fields.timeToClosure = TimeSpan.Subtract(issue.fields.customfield_14871, issue.fields.resolutiondate) ?? undefined;
             totalClosure += issue.fields.timeToClosure?.totalMilliSeconds ?? 0;
         }
+        //root cause merge with external reasons: customfield_14918
+        //if customfield_14918 is empty or id: 14629 we merge the external reason in the root cause
+        if ((!issue.fields.customfield_14918 || issue.fields.customfield_14918.id === "14629") && issue.fields.customfield_14969) {
+            issue.fields.customfield_14918 = { value: EXTERNAL_REASON };
+        }
+
+        //aggregating information for the charts and display
+        //14971 = services
+        rootCauses.AddToValue(issue.fields?.customfield_14918?.value ?? NONE_TEXT, 1);
+        //status
+        statuses.AddToValue(issue.fields?.status?.name ?? NONE_TEXT, 1);
+        //teams are harder, we have a list of linked caused for the incident
+        if ((issue.fields.issuelinks?.length ?? 0) === 0) {
+            teams.AddToValue(NONE_TEXT, 1);
+        } else {
+            for (var link of issue.fields.issuelinks) {
+                if (link?.type?.inward == "is caused by" && link.inwardIssue) {
+                    teams.AddToValue(link.inwardIssue?.fields?.project?.name ?? NONE_TEXT, 1);
+                }
+            }
+        }
+
         //error management on dates (for later)
         // if (rd.closureDate && rd.detectionDate && rd.detectionDate > rd.closureDate) {
         //     rd.errors.push(`The close date: ${rd.closureDate} is inferior to the detection date: ${rd.detectionDate}, likely an input error`);
@@ -163,12 +197,19 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
         // }
     }
 
+    rootCauses.SortValues();
+    statuses.SortValues();
+    teams.SortValues();
+
     return {
         ...payload,
         totalDetection: new TimeSpan(totalDetection),
         totalFix: new TimeSpan(totalFix),
         totalResolution: new TimeSpan(totalResolution),
-        totalClosure: new TimeSpan(totalClosure)
+        totalClosure: new TimeSpan(totalClosure),
+        rootCauses,
+        statuses,
+        teams
     };
 }
 

@@ -85,7 +85,7 @@ export module JiraModels {
         message: string;
     }
 
-    export interface Customfield14885 {
+    export interface EpicLinkEdition {
         hasEpicLinkFieldDependency: boolean;
         showField: boolean;
         nonEditableReason: NonEditableReason;
@@ -187,12 +187,6 @@ export module JiraModels {
         total: number;
     }
     
-    export interface Customfield13000 {
-        hasEpicLinkFieldDependency: boolean;
-        showField: boolean;
-        nonEditableReason: NonEditableReason;
-    }
-    
     export interface Fields {
         customfield_13100: string;
         resolution?: any;
@@ -226,7 +220,7 @@ export module JiraModels {
         customfield_14887?: any;
         customfield_14403?: any;
         customfield_14404?: any;
-        customfield_14885: Customfield14885;
+        customfield_14885: EpicLinkEdition;
         customfield_14402?: any;
         customfield_11008?: any;
         customfield_14879?: any;
@@ -286,7 +280,7 @@ export module JiraModels {
         updated: Date;
         timeoriginalestimate?: any;
         customfield_14850?: any;
-        customfield_14971?: any;
+        customfield_14971?: CustomValue;
         customfield_14972?: any;
         customfield_14851?: any;
         description: Description;
@@ -299,7 +293,7 @@ export module JiraModels {
         customfield_14852: Description;
         customfield_14853?: any;
         customfield_14974?: any;
-        customfield_14969?: any;
+        customfield_14969?: CustomValue;
         customfield_14848?: any;
         customfield_14966?: any;
         customfield_10007: string[];
@@ -459,7 +453,7 @@ export module JiraModels {
         customfield_11505?: any;
         customfield_11507?: any;
         customfield_11509?: any;
-        customfield_13000: Customfield13000;
+        customfield_13000: EpicLinkEdition;
         customfield_10401?: any;
         customfield_10402?: any;
         customfield_12700?: any;

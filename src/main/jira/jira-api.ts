@@ -36,8 +36,8 @@ export class JiraApi implements ApiContract {
                 {
                     jql: "type in (incident) Order by created desc",
                     maxResults: 100,
-                    fields: ["issuelinks", "status", "project", "assignee", "resolutiondate", "summary",
-                    "customfield_10201", "customfield_14918", "customfield_14976", "customfield_14977", "customfield_14871", "customfield_14971"]
+                    fields: ["issuelinks", "status", "project", "assignee", "resolutiondate", "summary", "created",
+                    "customfield_10201", "customfield_14918", "customfield_14976", "customfield_14977", "customfield_14871", "customfield_14971", "customfield_14969"]
                 });
             var searchPayload = <unknown>searchResult as JiraModels.RootObject;
             if ((searchPayload?.issues?.length ?? 0) > 0) {

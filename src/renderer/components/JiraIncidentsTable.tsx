@@ -1,8 +1,6 @@
 import { makeStyles, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Theme, createStyles, withStyles, TablePagination, Tooltip, Typography } from "@material-ui/core";
 import React from "react";
 import { JiraModels } from "src/main/models/jira-models";
-import dateFormat from "dateformat";
-import humanizeDuration from "humanize-duration";
 import IncidentsTimeline from "./IncidentTimeline";
 
 const StyledTableCell = withStyles((theme: Theme) =>

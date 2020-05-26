@@ -1,5 +1,5 @@
 import React, { Dispatch } from "react";
-import { makeStyles, createStyles, Grid, Paper, Theme, Typography, Card } from "@material-ui/core";
+import { makeStyles, createStyles, Grid, Paper, Theme, Typography, Card, Chip, Avatar } from "@material-ui/core";
 import { State } from "../redux/store";
 import { connect } from "react-redux";
 import { ElectronRequest } from "../../main/models/app-api-payload";
@@ -9,6 +9,12 @@ import { FetchData, IncidentsState } from "../redux/viewModels/incidentsViewMode
 import DataTable from "../components/JiraIncidentsTable";
 import TotalFilterNumbers from "../components/TotalFilterNumbers";
 import TimeDisplay from "../components/TimeDisplay";
+import { LineChart, Line, PieChart, Tooltip as ChartTooltip, Pie, Legend, Cell, ResponsiveContainer } from 'recharts';
+import CoolPieChart from "../components/CoolPieChart";
+import { COLORS_PASTEL } from "../consts";
+import StandardPieChart from "../components/StandardPieChart";
+import { NameValuePair } from "src/main/utils/nvp-array";
+import ChartLegend from "../components/chartLegend";
 
 const incidentStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -22,6 +28,10 @@ const incidentStyles = makeStyles((theme: Theme) =>
         },
         fullWidth: {
             width: "100%"
+        },
+        title: {
+            fontWeight: 700,
+            margin: theme.spacing(2)
         }
     }),
 );
@@ -37,6 +47,10 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
         setLoaded(true);
         props.getData();
     }
+
+    const teams = props.incidents?.payload?.teams?.ToArray();
+    const rootCauses = props.incidents?.payload?.rootCauses?.ToArray();
+    const statuses = props.incidents?.payload?.statuses?.ToArray();
 
     return (
         <div className={classes.root}>
@@ -78,7 +92,13 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={9}
                     xs={12}
                 >
-                    <Card>Timeline</Card>
+                    <Card>
+                        <Typography className={classes.title}
+                            color="textSecondary"
+                            gutterBottom
+                            variant="body2">Timeline
+                        </Typography>
+                    </Card>
                 </Grid>
                 <Grid
                     item
@@ -87,7 +107,17 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card>Teams</Card>
+                    <Card>
+                        <Typography className={classes.title}
+                            color="textSecondary"
+                            gutterBottom
+                            variant="body2">Teams
+                        </Typography>
+                        <ChartLegend data={teams}/>
+                        <StandardPieChart
+                            minHeight="300px"
+                            data={teams} />
+                    </Card>
                 </Grid>
                 <Grid
                     item
@@ -96,7 +126,17 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card>Root Causes</Card>
+                    <Card>
+                        <Typography className={classes.title}
+                            color="textSecondary"
+                            gutterBottom
+                            variant="body2">Root causes
+                        </Typography>
+                        <ChartLegend data={rootCauses}/>
+                        <StandardPieChart
+                            minHeight="300px"
+                            data={rootCauses} />
+                    </Card>
                 </Grid>
                 <Grid
                     item
@@ -105,7 +145,13 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card>Services</Card>
+                    <Card>
+                        <Typography className={classes.title}
+                            color="textSecondary"
+                            gutterBottom
+                            variant="body2">Services
+                        </Typography>
+                    </Card>
                 </Grid>
                 <Grid
                     item
@@ -114,7 +160,13 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card>Severities</Card>
+                    <Card>
+                        <Typography className={classes.title}
+                            color="textSecondary"
+                            gutterBottom
+                            variant="body2">Severities
+                        </Typography>
+                    </Card>
                 </Grid>
                 <Grid
                     item
@@ -123,7 +175,17 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card>Status</Card>
+                    <Card>
+                        <Typography className={classes.title}
+                            color="textSecondary"
+                            gutterBottom
+                            variant="body2">Statuses
+                        </Typography>
+                        <ChartLegend data={statuses}/>
+                        <StandardPieChart
+                            minHeight="300px"
+                            data={statuses} />
+                    </Card>
                 </Grid>
                 <Grid item className={classes.fullWidth}>
                     <DataTable data={props.incidents?.payload?.issues} />
