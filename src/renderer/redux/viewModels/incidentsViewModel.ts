@@ -6,6 +6,7 @@ import { Dispatch } from "react";
 import { ClientRequestHandler } from "../../../renderer/data/clientRequestHandler";
 import { TimeSpan } from "../../../main/utils/timespan";
 import { NvpArray } from "../../../main/utils/nvp-array";
+import Timeline from "../../../main/utils/timeline";
 
 export interface IncidentsState {
     payload: JiraIncidentRootObject;
@@ -34,7 +35,8 @@ export interface JiraIncidentRootObject extends JiraModels.RootObject {
     statuses: NvpArray;
     teams: NvpArray;
     services: NvpArray;
-    severities: NvpArray
+    severities: NvpArray,
+    timeline: Timeline
 }
 
 export interface FetchDataCommand extends Command {
@@ -115,7 +117,7 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
     statuses.AddToValue("Follow up", 0);
     statuses.AddToValue("Done", 0);
     statuses.AddToValue("Archive", 0);
-    
+
     var services = new NvpArray();
     var severities = new NvpArray(); //special sort, and custom not coded, so starting this way
     severities.AddToValue("Critical", 0);
@@ -123,11 +125,14 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
     severities.AddToValue("Minor", 0);
     severities.AddToValue("Trivial", 0);
     var teams = new NvpArray();
+    var timeline = new Timeline();
 
     for (let issue of payload.issues) {
         if (!issue) {
             continue;
         }
+
+        var incidentDate: Date;
 
         if (issue.fields.resolutiondate) {
             issue.fields.resolutiondate = new Date(issue.fields.resolutiondate);
@@ -139,7 +144,9 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
             issue.fields.customfield_14977 = new Date(issue.fields.customfield_14977);
         }
         if (issue.fields.customfield_14871) { //introduction
-            issue.fields.customfield_14871 = new Date(issue.fields.customfield_14871);
+            incidentDate = issue.fields.customfield_14871 = new Date(issue.fields.customfield_14871);
+        } else {
+            incidentDate = new Date(issue.fields.created);
         }
         if (issue.fields.customfield_14976 && issue.fields.customfield_14871) {
             issue.fields.timeToDetection = TimeSpan.Subtract(issue.fields.customfield_14871, issue.fields.customfield_14976) ?? undefined;
@@ -188,6 +195,11 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
                 services.AddToValue(service?.value ?? NONE_TEXT, 1);
             }
         }
+        //also the dates for the timeline, it's pretty complex
+        //for all the incidents, either they have a introduction date (preferred entry)
+        //or they have a creation date (worst case scenario)
+        //then everything have a month, but they also have a year, we have a dictionary of years, that contain a nvp array keyed by month
+        timeline.Add(incidentDate);
 
         //error management on dates (for later)
         // if (rd.closureDate && rd.detectionDate && rd.detectionDate > rd.closureDate) {
@@ -224,10 +236,11 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
     }
 
     rootCauses.SortValues();
-    //statuses.SortValues();
     teams.SortValues();
     services.SortValues();
-    //severities.SortValues();
+    //sorting by year
+    timeline.series.sort();
+
 
     return {
         ...payload,
@@ -239,7 +252,8 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
         statuses,
         teams,
         services,
-        severities
+        severities,
+        timeline
     };
 }
 

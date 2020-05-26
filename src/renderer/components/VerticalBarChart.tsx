@@ -2,10 +2,9 @@ import React from 'react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList, Cell,
 } from 'recharts';
-import { NameValuePair, NvpArray } from 'src/main/utils/nvp-array';
+import { NameValuePair, NvpArray } from '../../main/utils/nvp-array';
 import { COLORS_PASTEL } from '../consts';
 import { makeStyles, Theme, createStyles } from '@material-ui/core';
-import { Label } from '@material-ui/icons';
 
 const chartStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -29,8 +28,8 @@ function BarTooltip(props: Readonly<{
         const percent = (payload[0].value) / total;
         return (
             <div className={classes.customTooltip}>
-                <p>{`${label} : ${payload[0].value}`}</p>
-                <p>{`${(percent * 100).toFixed(2)}%`}</p>
+                <div>{`${label} : ${payload[0].value}`}</div>
+                <div>{`${(percent * 100).toFixed(2)}%`}</div>
             </div>
         );
     }
@@ -63,7 +62,7 @@ export default function VerticalBarChart(props: Readonly<{
         <ResponsiveContainer width="80%" height="90%" minHeight={minHeight} className={className}>
             <BarChart layout="vertical" data={data}>
                 <XAxis hide type="number" />
-                <YAxis type="category" dataKey="name"  tick={{ fill: 'white' }} />
+                <YAxis type="category" dataKey="name" tick={{ fill: 'white' }} />
                 <Tooltip content={<BarTooltip total={total} />} />
                 <Bar isAnimationActive={false}
                     dataKey="value"

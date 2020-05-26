@@ -159,7 +159,7 @@ export class TimeSpan {
 
     toString(): string {
         if (!this) { return ""; }
-        return `${this._days} day${this._days > 1 ? "s" : ""} ${this._hours}:${this._minutes}:${this._seconds}.${this.milliseconds}`;
+        return `${this._days} day${this._days > 1 ? "s" : ""} ${this._hours}h${this._minutes}m${this._seconds}s${this.milliseconds}`;
     }
 
 }

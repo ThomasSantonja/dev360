@@ -9,13 +9,14 @@ import { FetchData, IncidentsState } from "../redux/viewModels/incidentsViewMode
 import DataTable from "../components/JiraIncidentsTable";
 import TotalFilterNumbers from "../components/TotalFilterNumbers";
 import TimeDisplay from "../components/TimeDisplay";
-import { LineChart, Line, PieChart, Tooltip as ChartTooltip, Pie, Legend, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LabelList } from 'recharts';
+import { LineChart, Line, PieChart, Tooltip as ChartTooltip, Pie, Legend, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LabelList, CartesianGrid } from 'recharts';
 import CoolPieChart from "../components/CoolPieChart";
 import { COLORS_PASTEL } from "../consts";
 import StandardPieChart from "../components/StandardPieChart";
 import { NameValuePair } from "src/main/utils/nvp-array";
 import ChartLegend from "../components/ChartLegend";
 import VerticalBarChart from "../components/VerticalBarChart";
+import ChartTimeline from "../components/ChartTimeline";
 
 const incidentStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -63,6 +64,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
     const statuses = props.incidents?.payload?.statuses?.ToArray();
     const services = props.incidents?.payload?.services?.ToArray();
     const severities = props.incidents?.payload?.severities?.ToArray();
+    const timeline = props.incidents?.payload?.timeline?.ToBasicJs();
 
     return (
         <div className={classes.root}>
@@ -112,6 +114,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                             gutterBottom
                             variant="body2">Timeline
                         </Typography>
+                        <ChartTimeline data={timeline} series={props.incidents?.payload?.timeline?.series} minHeight={300}/>
                     </Card>
                 </Grid>
                 <Grid
@@ -186,7 +189,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                             gutterBottom
                             variant="body2">Severities
                         </Typography>
-                        <VerticalBarChart data={severities}  className={classes.title} minHeight={300} />
+                        <VerticalBarChart data={severities} className={classes.title} minHeight={300} />
                     </Card>
                 </Grid>
                 <Grid
@@ -202,8 +205,8 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                             color="textSecondary"
                             gutterBottom
                             variant="body2">Statuses
-                        </Typography>                        
-                        <VerticalBarChart data={statuses}  className={classes.title} minHeight={300} />
+                        </Typography>
+                        <VerticalBarChart data={statuses} className={classes.title} minHeight={300} />
                     </Card>
                 </Grid>
                 <Grid item className={classes.fullWidth}>
