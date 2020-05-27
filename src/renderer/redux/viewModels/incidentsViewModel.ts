@@ -7,6 +7,8 @@ import { ClientRequestHandler } from "../../../renderer/data/clientRequestHandle
 import { TimeSpan } from "../../../main/utils/timespan";
 import { NvpArray } from "../../../main/utils/nvp-array";
 import Timeline from "../../../main/utils/timeline";
+import { LocalCache } from "../../../main/storage/store";
+import { JiraApi } from "../../../main/jira/jira-api";
 
 export interface IncidentsState {
     payload: JiraIncidentRootObject;
@@ -57,8 +59,8 @@ export enum IncidentsCommands {
 const NONE_TEXT = "None";
 const EXTERNAL_REASON = "External reason";
 
-export function FetchDataStart(dataAccess: RefreshStrategy): FetchDataCommand {
-    return { type: IncidentsCommands.FETCH_DATA, dataAccess };
+export function FetchDataStart(dataAccess: RefreshStrategy, type: string): FetchDataCommand {
+    return { type: type, dataAccess };
 }
 
 export function FetchDataSuccess(originalRequest: ElectronRequest, payload: JiraModels.RootObject): FetchDataSuccessCommand {
@@ -262,12 +264,11 @@ export function FetchData(request: ElectronRequest) {
     return function (dispatch: Dispatch<any>) {
         // First dispatch: the app state is updated to inform
         // that the API call is starting.  
-        dispatch(FetchDataStart(request.parameters))
+        dispatch(FetchDataStart(request.parameters, IncidentsCommands.FETCH_DATA));
 
-        // The function called by the thunk middleware can return a value,
-        // that is passed on as the return value of the dispatch method.  
-        // In this case, we return a promise to wait for.
-        // This is not required by thunk middleware, but it is convenient for us.
+        // this call and the call back are hard coded now because I only have one page
+        //as soon as I have multiple page, the logic in sanitizing the incidents will need to be separated
+        //so that other requests can be centralized as well
         ClientRequestHandler.sendAsyncMessage(request, (response: ElectronResponse) => {
             response.response = sanitizeIncidents(response.response);
             dispatch(FetchDataSuccess(response.originalRequest, response.response));

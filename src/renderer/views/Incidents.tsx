@@ -6,17 +6,14 @@ import { ElectronRequest } from "../../main/models/app-api-payload";
 import { RefreshStrategy } from "../../main/main-api";
 import { JiraApi } from "../../main/jira/jira-api";
 import { FetchData, IncidentsState } from "../redux/viewModels/incidentsViewModel";
-import DataTable from "../components/JiraIncidentsTable";
 import TotalFilterNumbers from "../components/TotalFilterNumbers";
 import TimeDisplay from "../components/TimeDisplay";
 import { LineChart, Line, PieChart, Tooltip as ChartTooltip, Pie, Legend, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LabelList, CartesianGrid } from 'recharts';
-import CoolPieChart from "../components/CoolPieChart";
-import { COLORS_PASTEL } from "../consts";
 import StandardPieChart from "../components/StandardPieChart";
-import { NameValuePair } from "src/main/utils/nvp-array";
 import ChartLegend from "../components/ChartLegend";
 import VerticalBarChart from "../components/VerticalBarChart";
 import ChartTimeline from "../components/ChartTimeline";
+import StatefulJiraIncidentsTable from "../components/JiraIncidentsTable";
 
 const incidentStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -51,7 +48,6 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
 
     const classes = incidentStyles();
     const [loaded, setLoaded] = React.useState(false);
-    console.log(`rendering incidents, dataset is:`, props.incidents);
 
     if (!loaded) {
         console.log(`data not loaded, trying to request it from local cache`);
@@ -114,7 +110,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                             gutterBottom
                             variant="body2">Timeline
                         </Typography>
-                        <ChartTimeline data={timeline} series={props.incidents?.payload?.timeline?.series} minHeight={300}/>
+                        <ChartTimeline data={timeline} series={props.incidents?.payload?.timeline?.series} minHeight={300} />
                     </Card>
                 </Grid>
                 <Grid
@@ -210,7 +206,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     </Card>
                 </Grid>
                 <Grid item className={classes.fullWidth}>
-                    <DataTable data={props.incidents?.payload?.issues} />
+                    <StatefulJiraIncidentsTable data={props.incidents?.payload?.issues} />
                 </Grid>
             </Grid>
         </div>

@@ -38,3 +38,26 @@ export class Store {
         }
     }
 }
+
+export class LocalCache {
+
+    constructor(private content: { [key: string]: any } = {}) {
+
+    }
+
+    static Copy(origin: LocalCache): LocalCache {
+        return new LocalCache(origin.content);
+    }
+
+    Insert(key: string, value: any) {
+        this.content[key] = value;
+    }
+
+    Get(key: string): any {
+        return this.content[key];
+    }
+
+    get length(): number {
+        return Object.keys(this.content).length;
+    }
+}

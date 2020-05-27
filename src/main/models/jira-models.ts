@@ -52,17 +52,17 @@ export module JiraModels {
         inwardIssue: Issue;
     }
 
-    // export interface AvatarUrls {
-    //     48x48: string;
-    //     24x24: string;
-    //     16x16: string;
-    //     32x32: string;
-    // }
+    export interface AvatarUrls {
+        "48x48": string;
+        "24x24": string;
+        "16x16": string;
+        "32x32": string;
+    }
 
     export interface Assignee {
         self: string;
         accountId: string;
-        avatarUrls: any;
+        avatarUrls: AvatarUrls;
         displayName: string;
         active: boolean;
         timeZone: string;
@@ -73,7 +73,7 @@ export module JiraModels {
         self: string;
         accountId: string;
         emailAddress: string;
-        avatarUrls: any;
+        avatarUrls: AvatarUrls;
         displayName: string;
         active: boolean;
         timeZone: string;
@@ -116,7 +116,7 @@ export module JiraModels {
         name: string;
         projectTypeKey: string;
         simplified: boolean;
-        avatarUrls: any;
+        avatarUrls: AvatarUrls;
         projectCategory: ProjectCategory;
     }
 
@@ -175,7 +175,7 @@ export module JiraModels {
         self: string;
         accountId: string;
         emailAddress: string;
-        avatarUrls: any;
+        avatarUrls: AvatarUrls;
         displayName: string;
         active: boolean;
         timeZone: string;

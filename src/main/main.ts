@@ -1,6 +1,7 @@
-import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu } from "electron";
+import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu, ClientRequest } from "electron";
 import MainApi from "./main-api";
 import { Store } from "./storage/store";
+
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 
 //installable prod version command line:

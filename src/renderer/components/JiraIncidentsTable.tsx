@@ -1,7 +1,13 @@
-import { makeStyles, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Theme, createStyles, withStyles, TablePagination, Tooltip, Typography } from "@material-ui/core";
-import React from "react";
-import { JiraModels } from "src/main/models/jira-models";
+import { makeStyles, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Theme, createStyles, withStyles, TablePagination, Tooltip, Typography, Avatar, Chip } from "@material-ui/core";
+import React, { Dispatch } from "react";
+import { JiraModels } from "../../main/models/jira-models";
 import IncidentsTimeline from "./IncidentTimeline";
+import { LocalCache } from "../../main/storage/store";
+import { FetchAvatar } from "../redux/viewModels/avatarsViewModel";
+import { JiraApi } from "../../main/jira/jira-api";
+import { ElectronRequest } from "../../main/models/app-api-payload";
+import { State } from "../redux/store";
+import { connect } from "react-redux";
 
 const StyledTableCell = withStyles((theme: Theme) =>
     createStyles({
@@ -32,8 +38,19 @@ const incidentTableStyles = makeStyles((theme: Theme) =>
         root: {
             width: "100%"
         },
-        timeline:{
+        timeline: {
             minWidth: "300px"
+        },
+        smallAvatar: {
+            width: theme.spacing(3),
+            height: theme.spacing(3),
+            marginRight: theme.spacing(1)
+        },
+        nameCell: {
+            display: "flex",
+            flexFlow: "row wrap",
+            justifyContent: "flex-start",
+            alignItems: "center"
         }
     }));
 
@@ -56,10 +73,12 @@ export interface TableHeader<T> {
 
 const NONE_VALUE = "None";
 
-export default function JiraIncidentsTable(props: { data: Array<JiraModels.Issue> }) {
+function JiraIncidentsTable(props: Readonly<{ data: Array<JiraModels.Issue>, avatarSrc: LocalCache, getAvatar: (key: string) => void }>) {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const classes = incidentTableStyles();
+
+    const { data, avatarSrc, ...rest } = props;
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -69,6 +88,18 @@ export default function JiraIncidentsTable(props: { data: Array<JiraModels.Issue
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
+
+    const getAvatar = (key: string): string | undefined => {
+        if (!key || key === "" || !avatarSrc) {
+            return undefined;
+        }
+        if (!avatarSrc.Get(key)) {
+            props.getAvatar(key);
+        }
+        else {
+            return avatarSrc.Get(key);
+        }
+    }
 
     return (
         <Paper className={classes.root}>
@@ -92,9 +123,19 @@ export default function JiraIncidentsTable(props: { data: Array<JiraModels.Issue
                                 <StyledTableRow key={row.key}>
                                     <TableCell><Tooltip title={row.fields?.summary}><Typography className={classes.keyText}>{row.key}</Typography></Tooltip></TableCell>
                                     <TableCell align="left">{row.fields?.status?.name ?? NONE_VALUE}</TableCell>
-                                    <TableCell align="left">{row.fields?.project?.name ?? NONE_VALUE}</TableCell>
+                                    <TableCell align="left">{row.fields?.project?.name ?? NONE_VALUE}
+                                        {/* <Chip
+                                            label={row.fields?.project?.name ?? NONE_VALUE}
+                                            avatar={<Avatar src={getAvatar(row.fields?.project?.avatarUrls?.["24x24"])} />}
+                                        /> */}
+                                    </TableCell>
                                     <TableCell align="center">{row.fields?.customfield_10201?.value ?? NONE_VALUE}</TableCell>
-                                    <TableCell align="left">{row.fields?.assignee?.displayName ?? NONE_VALUE}</TableCell>
+                                    <TableCell align="left">
+                                        <div className={classes.nameCell}>
+                                            <Avatar className={classes.smallAvatar} alt={row.fields?.assignee?.displayName} src={getAvatar(row.fields?.assignee?.avatarUrls?.["24x24"])} />
+                                            <div>{row.fields?.assignee?.displayName ?? NONE_VALUE}</div>
+                                        </div>
+                                    </TableCell>
                                     <TableCell align="left">{row.fields?.customfield_14918?.value ?? NONE_VALUE}</TableCell>
                                     <TableCell align="right">{row.fields?.customfield_14971?.length ?? NONE_VALUE}</TableCell>
                                     <TableCell align="center" className={classes.timeline}><IncidentsTimeline incident={row} /></TableCell>
@@ -116,3 +157,24 @@ export default function JiraIncidentsTable(props: { data: Array<JiraModels.Issue
         </Paper>
     );
 }
+
+const mapDispatchToProps = (dispatch: Dispatch<any>) => {
+    return {
+        getAvatar: (key: string) => {
+            console.log(`jira table incident trying to get the avatar:`, key);
+            dispatch(FetchAvatar({
+                contract: JiraApi.GET_AVATAR,
+                provider: JiraApi.JIRA_PROVIDER,
+                parameters: key
+            } as ElectronRequest));
+        }
+    }
+}
+
+const mapStateToProps = (state: State) => (
+    {
+        avatarSrc: state.UpdateAvatarsState.avatars
+    });
+
+const StatefulJiraIncidentsTable = connect(mapStateToProps, mapDispatchToProps)(JiraIncidentsTable);
+export default StatefulJiraIncidentsTable;
