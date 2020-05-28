@@ -62,7 +62,7 @@ export default function VerticalBarChart(props: Readonly<{
         <ResponsiveContainer width="80%" height="90%" minHeight={minHeight} className={className}>
             <BarChart layout="vertical" data={data}>
                 <XAxis hide type="number" />
-                <YAxis type="category" dataKey="name" tick={{ fill: 'white' }} />
+                <YAxis type="category" dataKey="name" tick={{ fill: 'white' }} width={90}/>
                 <Tooltip content={<BarTooltip total={total} />} />
                 <Bar isAnimationActive={false}
                     dataKey="value"

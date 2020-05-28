@@ -54,10 +54,10 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: COLORS_PASTEL[0]
     },
     differenceNegative: {
-        backgroundColor: "rgba(100,0,0,0.2)"
+        backgroundColor:  COLORS_PASTEL[9]
     },
     differencePositive: {
-        backgroundColor: "rgba(0,100,0,0.2)"
+        backgroundColor:  COLORS_PASTEL[5]
     }
 }));
 
@@ -79,7 +79,7 @@ export default function TotalFilterNumbers(props: Readonly<any>) {
                     </Typography>
                     <div className={classes.incidentInfo}>
                         <Typography variant="h4">{total}</Typography>
-                        <Tooltip title="Since the last update">
+                        <Tooltip title="Since last week">
                             <Chip
                                 label={delta + " new incidents"}
                                 className={clsx(classes.differenceValue, {

@@ -124,9 +124,6 @@ export class JiraApi implements ApiContract {
 
     async getBase64Image(url: string): Promise<string> {
         try {
-            //https://ssense.atlassian.net/secure/projectavatar?size=small&s=small&pid=18802&avatarId=19454
-            //https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5e13574561d95d0d9aa62903/cd63d075-4544-428b-bb4b-0142ad4487ba/128?size=16&s=16    
-            var urlObject = new URL(url);
             const getStream = bent();
             let stream = await getStream(url) as any;
             if ((stream?.statusCode ?? 0) != 200) {

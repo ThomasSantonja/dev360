@@ -14,6 +14,7 @@ import ChartLegend from "../components/ChartLegend";
 import VerticalBarChart from "../components/VerticalBarChart";
 import ChartTimeline from "../components/ChartTimeline";
 import StatefulJiraIncidentsTable from "../components/JiraIncidentsTable";
+import clsx from 'clsx';
 
 const incidentStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -22,10 +23,6 @@ const incidentStyles = makeStyles((theme: Theme) =>
         },
         chartCardsContainer: {
             alignItems: "stretch"
-        },
-        chartCard: {
-            // height: "100%",
-            // maxHeight: "500px"
         },
         paper: {
             padding: theme.spacing(2),
@@ -38,6 +35,26 @@ const incidentStyles = makeStyles((theme: Theme) =>
         title: {
             fontWeight: 700,
             margin: theme.spacing(2)
+        },
+        gridItemFirstRow: {
+        },
+        gridItemSecondRow: {
+            minHeight: "430px",
+            maxHeight: "430px",
+            display: "flex",
+            flexFlow: "column nowrap",
+            justifyContent: "flexStart"
+        },
+        gridItemThirdRow: {
+            minHeight: "480px",
+            maxHeight: "480px",
+            display: "flex",
+            flexFlow: "column nowrap",
+            justifyContent: "flexStart"
+        },
+        gridSubItemCenter: {
+            marginTop: "auto",
+            marginBottom: "auto"
         }
     }),
 );
@@ -76,7 +93,11 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={4}
                     xs={12}
                 >
-                    <TotalFilterNumbers itemName="incidents" delta={props.incidents?.increasedPayload} total={props.incidents?.payload?.total} />
+                    <TotalFilterNumbers
+                        className={classes.gridItemFirstRow}
+                        itemName="incidents"
+                        delta={props.incidents?.payload?.lastWeek}
+                        total={props.incidents?.payload?.total} />
                 </Grid>
                 <Grid
                     item
@@ -85,7 +106,10 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={4}
                     xs={12}
                 >
-                    <TimeDisplay selectedType="Average" average timeTotal={props.incidents?.payload} />
+                    <TimeDisplay
+                        className={classes.gridItemFirstRow}
+                        selectedType="Average"
+                        average timeTotal={props.incidents?.payload} />
                 </Grid>
                 <Grid
                     item
@@ -94,7 +118,10 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={4}
                     xs={12}
                 >
-                    <TimeDisplay selectedType="Sum" timeTotal={props.incidents?.payload} />
+                    <TimeDisplay
+                        className={classes.gridItemFirstRow}
+                        selectedType="Sum"
+                        timeTotal={props.incidents?.payload} />
                 </Grid>
                 <Grid
                     item
@@ -103,14 +130,13 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={9}
                     xs={12}
                 >
-                    <Card
-                        className={classes.chartCard}>
+                    <Card className={classes.gridItemSecondRow}>
                         <Typography className={classes.title}
                             color="textSecondary"
                             gutterBottom
                             variant="body2">Timeline
                         </Typography>
-                        <ChartTimeline data={timeline} series={props.incidents?.payload?.timeline?.series} minHeight={300} />
+                        <ChartTimeline className={classes.gridSubItemCenter} data={timeline} series={props.incidents?.payload?.timeline?.series} minHeight={280} />
                     </Card>
                 </Grid>
                 <Grid
@@ -120,8 +146,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card
-                        className={classes.chartCard}>
+                    <Card className={classes.gridItemSecondRow}>
                         <Typography className={classes.title}
                             color="textSecondary"
                             gutterBottom
@@ -130,6 +155,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                         <ChartLegend data={teams} />
                         <StandardPieChart
                             minHeight={chartMinHeight}
+                            className={classes.gridSubItemCenter}
                             data={teams} />
                     </Card>
                 </Grid>
@@ -140,8 +166,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card
-                        className={classes.chartCard}>
+                    <Card className={classes.gridItemThirdRow}>
                         <Typography className={classes.title}
                             color="textSecondary"
                             gutterBottom
@@ -149,7 +174,8 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                         </Typography>
                         <ChartLegend data={rootCauses} />
                         <StandardPieChart
-                            minHeight={chartMinHeight}
+                            className={classes.gridSubItemCenter}
+                            minHeight={"266px"}
                             data={rootCauses} />
                     </Card>
                 </Grid>
@@ -160,13 +186,14 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card>
+                    <Card className={classes.gridItemThirdRow}>
                         <Typography className={classes.title}
                             color="textSecondary"
                             gutterBottom
                             variant="body2">Services
                         </Typography>
                         <StandardPieChart
+                            className={classes.gridSubItemCenter}
                             minHeight={chartMinHeight}
                             data={services} />
                     </Card>
@@ -178,14 +205,13 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card
-                        className={classes.chartCard}>
+                    <Card className={classes.gridItemThirdRow}>
                         <Typography className={classes.title}
                             color="textSecondary"
                             gutterBottom
                             variant="body2">Severities
                         </Typography>
-                        <VerticalBarChart data={severities} className={classes.title} minHeight={300} />
+                        <VerticalBarChart className={clsx([classes.gridSubItemCenter, classes.title])} data={severities} minHeight={280} />
                     </Card>
                 </Grid>
                 <Grid
@@ -195,14 +221,13 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xl={3}
                     xs={12}
                 >
-                    <Card
-                        className={classes.chartCard}>
+                    <Card className={classes.gridItemThirdRow}>
                         <Typography className={classes.title}
                             color="textSecondary"
                             gutterBottom
                             variant="body2">Statuses
                         </Typography>
-                        <VerticalBarChart data={statuses} className={classes.title} minHeight={300} />
+                        <VerticalBarChart  className={clsx([classes.gridSubItemCenter, classes.title])} data={statuses} minHeight={280} />
                     </Card>
                 </Grid>
                 <Grid item className={classes.fullWidth}>

@@ -79,7 +79,7 @@ export default function StandardPieChart(props: Readonly<{
     };
 
     return (
-        <ResponsiveContainer width="100%" height="100%" minHeight={minHeight}>
+        <ResponsiveContainer width="100%" height="100%" minHeight={minHeight} className={className}>
             <PieChart>
                 <Pie dataKey="value"
                     activeIndex={state.activeIndex}

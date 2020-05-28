@@ -42,7 +42,8 @@ export default class Main {
                 width: size[0],
                 height: size[1],
                 x: pos[0],
-                y: pos[1]
+                y: pos[1],
+                fullscreen: Main.mainWindow.isFullScreen()
             };
             Main.appStore.Update(state);
         } catch (error) {
@@ -54,8 +55,7 @@ export default class Main {
 
         let state: BrowserWindowConstructorOptions = {};
         try {
-            state = Main.appStore.Read() ?? { width: 800, height: 600 };
-
+            state = Main.appStore.Read() ?? { width: 800, height: 600, fullscreen: false };
         } catch (error) {
 
         }

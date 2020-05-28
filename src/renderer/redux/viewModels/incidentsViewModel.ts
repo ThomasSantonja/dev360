@@ -16,15 +16,13 @@ export interface IncidentsState {
     isFetching: boolean;
     hasFetched: boolean;
     lastUpdate?: Date;
-    increasedPayload: number;
 };
 
 const defaultIncidentsState: IncidentsState = {
     payload: null as unknown as JiraIncidentRootObject,
     filters: null,
     hasFetched: false,
-    isFetching: false,
-    increasedPayload: 0
+    isFetching: false
 };
 
 export interface JiraIncidentRootObject extends JiraModels.RootObject {
@@ -38,7 +36,8 @@ export interface JiraIncidentRootObject extends JiraModels.RootObject {
     teams: NvpArray;
     services: NvpArray;
     severities: NvpArray,
-    timeline: Timeline
+    timeline: Timeline,
+    lastWeek: number
 }
 
 export interface FetchDataCommand extends Command {
@@ -89,8 +88,7 @@ export function UpdateIncidentsState(state: IncidentsState = defaultIncidentsSta
                     isFetching: false,
                     hasFetched: true,
                     lastUpdate: fetchSuccessAction.payload?.lastAccessDate,
-                    payload: fetchSuccessAction.payload,
-                    increasedPayload: increase
+                    payload: fetchSuccessAction.payload
                 } as IncidentsState);
         default:
             return state
@@ -128,6 +126,15 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
     severities.AddToValue("Trivial", 0);
     var teams = new NvpArray();
     var timeline = new Timeline();
+    var timelineDetectionTT = new Timeline();
+    var timelineFixTT = new Timeline();
+    var timelineResolutionTT = new Timeline();
+    var timelineClosureTT = new Timeline();
+
+    //we want to calculate how many incidents have happened since last week, so first let's consider last week start date
+    var lastWeekStartDate = new Date();
+    lastWeekStartDate.setDate(lastWeekStartDate.getDate() - 7)
+    var lastWeek: number = 0;
 
     for (let issue of payload.issues) {
         if (!issue) {
@@ -203,6 +210,17 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
         //then everything have a month, but they also have a year, we have a dictionary of years, that contain a nvp array keyed by month
         timeline.Add(incidentDate);
 
+        
+    // timelineDetectionTT
+    // timelineFixTT
+    // timelineResolutionTT
+    // timelineClosureTT
+
+        //last week ?
+        if (incidentDate > lastWeekStartDate) {
+            lastWeek += 1;
+        }
+
         //error management on dates (for later)
         // if (rd.closureDate && rd.detectionDate && rd.detectionDate > rd.closureDate) {
         //     rd.errors.push(`The close date: ${rd.closureDate} is inferior to the detection date: ${rd.detectionDate}, likely an input error`);
@@ -255,7 +273,8 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
         teams,
         services,
         severities,
-        timeline
+        timeline,
+        lastWeek
     };
 }
 

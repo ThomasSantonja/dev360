@@ -71,6 +71,10 @@ export interface TableHeader<T> {
     accessor: (itm: T) => string;
 }
 
+//the idea is that the client should only request once any icon, if it failed, then so be it (optimisation)
+//the whole concept, and management should move to the view model later, for now moving fast track on the MVP
+const requestedKey: Array<string> = new Array<string>();
+
 const NONE_VALUE = "None";
 
 function JiraIncidentsTable(props: Readonly<{ data: Array<JiraModels.Issue>, avatarSrc: LocalCache, getAvatar: (key: string) => void }>) {
@@ -94,6 +98,12 @@ function JiraIncidentsTable(props: Readonly<{ data: Array<JiraModels.Issue>, ava
             return undefined;
         }
         if (!avatarSrc.Get(key)) {
+            if (requestedKey.indexOf(key) !== -1) {
+                //not requesting again
+                return undefined;
+            }
+            //saving the fact we requested
+            requestedKey.push(key);
             props.getAvatar(key);
         }
         else {

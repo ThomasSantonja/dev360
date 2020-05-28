@@ -27,8 +27,6 @@ export default function ChartTimeline(props: Readonly<{
     return (
         <ResponsiveContainer width="80%" height="90%" minHeight={minHeight} className={className}>
             <BarChart
-                // width={500}
-                // height={300}
                 data={data}
                 margin={{
                     top: 5, right: 5, left: 20, bottom: 5,
@@ -42,7 +40,9 @@ export default function ChartTimeline(props: Readonly<{
                 {series?.map((ser, idx) => 
                     <Bar key={`tmln-${idx}`}
                         dataKey={ser}
-                        fill={COLORS_PASTEL[idx % COLORS_PASTEL.length]} />
+                        fill={COLORS_PASTEL[idx % COLORS_PASTEL.length]}
+                        stroke={"white"}
+                        radius={[6, 6, 0, 0]} />
                 )}
             </BarChart>
         </ResponsiveContainer >
