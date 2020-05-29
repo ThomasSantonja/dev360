@@ -109,7 +109,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     <TimeDisplay
                         className={classes.gridItemFirstRow}
                         selectedType="Average"
-                        average timeTotal={props.incidents?.payload} />
+                        average payload={props.incidents?.payload} />
                 </Grid>
                 <Grid
                     item
@@ -121,7 +121,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     <TimeDisplay
                         className={classes.gridItemFirstRow}
                         selectedType="Sum"
-                        timeTotal={props.incidents?.payload} />
+                        payload={props.incidents?.payload}  />
                 </Grid>
                 <Grid
                     item
@@ -227,7 +227,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                             gutterBottom
                             variant="body2">Statuses
                         </Typography>
-                        <VerticalBarChart  className={clsx([classes.gridSubItemCenter, classes.title])} data={statuses} minHeight={280} />
+                        <VerticalBarChart className={clsx([classes.gridSubItemCenter, classes.title])} data={statuses} minHeight={280} />
                     </Card>
                 </Grid>
                 <Grid item className={classes.fullWidth}>

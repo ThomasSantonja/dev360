@@ -40,6 +40,13 @@ export interface JiraIncidentRootObject extends JiraModels.RootObject {
     lastWeek: number
 }
 
+export enum TimeTypes {
+    Detection = "Detection",
+    Fix = "Fix",
+    Resolution = "Resolution",
+    Closure = "Closure"
+}
+
 export interface FetchDataCommand extends Command {
     dataAccess: RefreshStrategy;
 }
@@ -126,10 +133,6 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
     severities.AddToValue("Trivial", 0);
     var teams = new NvpArray();
     var timeline = new Timeline();
-    var timelineDetectionTT = new Timeline();
-    var timelineFixTT = new Timeline();
-    var timelineResolutionTT = new Timeline();
-    var timelineClosureTT = new Timeline();
 
     //we want to calculate how many incidents have happened since last week, so first let's consider last week start date
     var lastWeekStartDate = new Date();
@@ -159,19 +162,19 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
         }
         if (issue.fields.customfield_14976 && issue.fields.customfield_14871) {
             issue.fields.timeToDetection = TimeSpan.Subtract(issue.fields.customfield_14871, issue.fields.customfield_14976) ?? undefined;
-            totalDetection += issue.fields.timeToDetection?.totalMilliSeconds ?? 0;
+            totalDetection += Math.abs(issue.fields.timeToDetection?.totalMilliSeconds ?? 0);
         }
         if (issue.fields.customfield_14976 && issue.fields.customfield_14977) {
             issue.fields.timeToFix = TimeSpan.Subtract(issue.fields.customfield_14976, issue.fields.customfield_14977) ?? undefined;
-            totalFix += issue.fields.timeToFix?.totalMilliSeconds ?? 0;
+            totalFix += Math.abs(issue.fields.timeToFix?.totalMilliSeconds ?? 0);
         }
         if (issue.fields.customfield_14871 && issue.fields.customfield_14977) {
             issue.fields.timeToResolution = TimeSpan.Subtract(issue.fields.customfield_14871, issue.fields.customfield_14977) ?? undefined;
-            totalResolution += issue.fields.timeToResolution?.totalMilliSeconds ?? 0;
+            totalResolution += Math.abs(issue.fields.timeToResolution?.totalMilliSeconds ?? 0);
         }
         if (issue.fields.customfield_14871 && issue.fields.resolutiondate) {
             issue.fields.timeToClosure = TimeSpan.Subtract(issue.fields.customfield_14871, issue.fields.resolutiondate) ?? undefined;
-            totalClosure += issue.fields.timeToClosure?.totalMilliSeconds ?? 0;
+            totalClosure += Math.abs(issue.fields.timeToClosure?.totalMilliSeconds ?? 0);
         }
         //root cause merge with external reasons: customfield_14918
         //if customfield_14918 is empty or id: 14629 we merge the external reason in the root cause
@@ -209,12 +212,6 @@ function sanitizeIncidents(payload: JiraModels.RootObject): JiraIncidentRootObje
         //or they have a creation date (worst case scenario)
         //then everything have a month, but they also have a year, we have a dictionary of years, that contain a nvp array keyed by month
         timeline.Add(incidentDate);
-
-        
-    // timelineDetectionTT
-    // timelineFixTT
-    // timelineResolutionTT
-    // timelineClosureTT
 
         //last week ?
         if (incidentDate > lastWeekStartDate) {

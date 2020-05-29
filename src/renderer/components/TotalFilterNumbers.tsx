@@ -41,8 +41,9 @@ const useStyles = makeStyles(theme => ({
     },
     cardRoot: {
         width: "100%",
+        padding: theme.spacing(1),
         "&:last-child": {
-            paddingBottom: 0
+            paddingBottom: theme.spacing(1)
         }
     },
     differenceIcon: {
@@ -71,14 +72,12 @@ export default function TotalFilterNumbers(props: Readonly<any>) {
         <Card {...rest} className={clsx(classes.root, className)}>
             <CardContent className={classes.cardRoot}>
                 <div className={classes.data}>
-                    <Typography className={classes.title}
-                        color="textSecondary"
-                        gutterBottom
-                        variant="body2">
+                    <Typography className={classes.title} 
+                        gutterBottom>
                         Total {itemName}
                     </Typography>
                     <div className={classes.incidentInfo}>
-                        <Typography variant="h4">{total}</Typography>
+                        <Typography variant="h5">{total}</Typography>
                         <Tooltip title="Since last week">
                             <Chip
                                 label={delta + " new incidents"}

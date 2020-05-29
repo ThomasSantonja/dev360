@@ -33,11 +33,11 @@ export default function ChartTimeline(props: Readonly<{
                 }}
             >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" tick={ {fill: 'white' }}/>
-                <YAxis tick={ {fill: 'white' }} />
+                <XAxis dataKey="month" tick={{ fill: 'white' }} />
+                <YAxis tick={{ fill: 'white' }} />
                 <Tooltip />
                 <Legend />
-                {series?.map((ser, idx) => 
+                {series?.map((ser, idx) =>
                     <Bar key={`tmln-${idx}`}
                         dataKey={ser}
                         fill={COLORS_PASTEL[idx % COLORS_PASTEL.length]}

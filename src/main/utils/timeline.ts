@@ -26,6 +26,13 @@ export default class Timeline {
         }
     }
 
+    Get(year: string, month: number): number {
+        if (this.series.indexOf(year?.toString()) !== -1) {
+            return this.entries[month].values[year];
+        }
+        return 0;
+    }
+
     Add(date: Date, value: number = 1): void {
         if (!date) {
             throw new Error(`invalid (null) date passed`);
