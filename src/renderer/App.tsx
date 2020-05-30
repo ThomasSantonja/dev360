@@ -72,6 +72,9 @@ export function App(props: Readonly<{ route?: string, routeChangeHandler?: any }
                 } />
                 <Route render={
                   () => {
+                    props.routeChangeHandler("Incidents");
+                    return (<StatefulIncidentsView />);
+                    //no default for now, kept here only for testing the layouts
                     props.routeChangeHandler("In Progress");
                     return (<InProgressView />);
                   }

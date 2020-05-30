@@ -3,6 +3,7 @@ export interface ElectronRequest {
     provider: string;
     contract: string;
     parameters: any;
+    callBackParameters: any;
 }
 
 export interface ElectronResponse {

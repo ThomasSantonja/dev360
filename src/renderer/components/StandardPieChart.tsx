@@ -55,8 +55,9 @@ const renderActiveShape = (props: Readonly<{
                 startAngle={startAngle}
                 endAngle={endAngle}
                 innerRadius={outerRadius + 6}
-                outerRadius={outerRadius + 10}
+                outerRadius={outerRadius + 12}
                 fill={fill}
+                stroke={stroke}
             />
         </g>
     );

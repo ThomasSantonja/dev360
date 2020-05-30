@@ -3,6 +3,7 @@ export interface NameValuePair {
     value: number;
 }
 
+//just a ultra specialised dictionary that is optimized for the consumption with the selected chart framework (recharts) so the UI just get the data and use it with little need for manipulation
 export class NvpArray {
 
     content: Array<NameValuePair> = new Array<NameValuePair>();
@@ -72,6 +73,10 @@ export class NvpArray {
 
     ToArray(): Array<NameValuePair> {
         return this.content;
+    }
+
+    GetKeys(): Array<string> {
+        return this.content?.map((c) => c.name);
     }
 
     private _partition(left: number = 0, right: number = this.content.length - 1): number {

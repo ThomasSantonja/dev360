@@ -1,20 +1,22 @@
 import React, { Dispatch } from "react";
-import { makeStyles, createStyles, Grid, Paper, Theme, Typography, Card, Chip, Avatar } from "@material-ui/core";
+import { makeStyles, createStyles, Grid, Paper, Theme, Typography, Card, Chip, Avatar, IconButton, MenuItem } from "@material-ui/core";
 import { State } from "../redux/store";
 import { connect } from "react-redux";
 import { ElectronRequest } from "../../main/models/app-api-payload";
 import { RefreshStrategy } from "../../main/main-api";
 import { JiraApi } from "../../main/jira/jira-api";
-import { FetchData, IncidentsState } from "../redux/viewModels/incidentsViewModel";
+import { FetchData, IncidentsState, IncidentFilterTypes } from "../redux/viewModels/incidentsViewModel";
 import TotalFilterNumbers from "../components/TotalFilterNumbers";
 import TimeDisplay from "../components/TimeDisplay";
-import { LineChart, Line, PieChart, Tooltip as ChartTooltip, Pie, Legend, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LabelList, CartesianGrid } from 'recharts';
+import FilterIcon from "../components/icons/FilterIcon";
 import StandardPieChart from "../components/StandardPieChart";
 import ChartLegend from "../components/ChartLegend";
 import VerticalBarChart from "../components/VerticalBarChart";
 import ChartTimeline from "../components/ChartTimeline";
 import StatefulJiraIncidentsTable from "../components/JiraIncidentsTable";
 import clsx from 'clsx';
+import { Menu } from "electron";
+import StatefulFilterMenu from "../components/FilterMenu";
 
 const incidentStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -38,6 +40,11 @@ const incidentStyles = makeStyles((theme: Theme) =>
         },
         gridItemFirstRow: {
         },
+        cardWithFilter: {
+            display: "flex",
+            flexFlow: "row nowrap",
+            justifyContent: "flexStart"
+        },
         gridItemSecondRow: {
             minHeight: "430px",
             maxHeight: "430px",
@@ -55,6 +62,19 @@ const incidentStyles = makeStyles((theme: Theme) =>
         gridSubItemCenter: {
             marginTop: "auto",
             marginBottom: "auto"
+        },
+        buttonIcon: {
+            width: theme.spacing(2),
+            height: theme.spacing(2),
+            color: theme.palette.text.secondary
+        },
+        filterButton: {
+            width: theme.spacing(4),
+            height: theme.spacing(4),
+            marginLeft: "auto",
+            marginBottom: "auto",
+            marginTop: "auto",
+            marginRight: theme.spacing(1)
         }
     }),
 );
@@ -72,12 +92,24 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
         props.getData();
     }
 
+    const assignees = props.incidents?.payload?.assignees?.ToArray();
     const teams = props.incidents?.payload?.teams?.ToArray();
     const rootCauses = props.incidents?.payload?.rootCauses?.ToArray();
     const statuses = props.incidents?.payload?.statuses?.ToArray();
     const services = props.incidents?.payload?.services?.ToArray();
     const severities = props.incidents?.payload?.severities?.ToArray();
     const timeline = props.incidents?.payload?.timeline?.ToBasicJs();
+
+    const isFiltered = !(props.incidents?.filters?.noFilters ?? true);
+
+    const filteredAssignees = props.incidents?.filteredPayload?.assignees?.ToArray();
+    const filteredteams = props.incidents?.filteredPayload?.teams?.ToArray();
+    const filteredrootCauses = props.incidents?.filteredPayload?.rootCauses?.ToArray();
+    const filteredstatuses = props.incidents?.filteredPayload?.statuses?.ToArray();
+    const filteredservices = props.incidents?.filteredPayload?.services?.ToArray();
+    const filteredseverities = props.incidents?.filteredPayload?.severities?.ToArray();
+    //next version, out of scope for MVP
+    //const filteredtimeline = props.incidents?.filteredPayload?.assignees?.ToArray();
 
     return (
         <div className={classes.root}>
@@ -97,7 +129,9 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                         className={classes.gridItemFirstRow}
                         itemName="incidents"
                         delta={props.incidents?.payload?.lastWeek}
-                        total={props.incidents?.payload?.total} />
+                        total={props.incidents?.payload?.total}
+                        filters={props.incidents?.filters}
+                        filteredTotal={props.incidents?.filteredPayload?.total} />
                 </Grid>
                 <Grid
                     item
@@ -109,7 +143,9 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     <TimeDisplay
                         className={classes.gridItemFirstRow}
                         selectedType="Average"
-                        average payload={props.incidents?.payload} />
+                        average 
+                        payload={props.incidents?.payload}
+                        payloadFiltered={props.incidents?.filteredPayload} />
                 </Grid>
                 <Grid
                     item
@@ -121,14 +157,33 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     <TimeDisplay
                         className={classes.gridItemFirstRow}
                         selectedType="Sum"
-                        payload={props.incidents?.payload}  />
+                        payload={props.incidents?.payload}
+                        payloadFiltered={props.incidents?.filteredPayload} />
                 </Grid>
                 <Grid
                     item
-                    lg={9}
-                    md={12}
-                    xl={9}
-                    xs={12}
+                    xs={3}
+                >
+                    <Card className={classes.gridItemSecondRow}>
+                        <div className={classes.cardWithFilter}>
+                            <Typography className={classes.title}
+                                color="textSecondary"
+                                gutterBottom
+                                variant="body2">Assignee
+                            </Typography>
+                            <StatefulFilterMenu
+                                data={assignees}
+                                filterName={IncidentFilterTypes[IncidentFilterTypes.assignees]} />
+                        </div>
+                        <StandardPieChart
+                            minHeight={chartMinHeight}
+                            className={classes.gridSubItemCenter}
+                            data={isFiltered ? filteredAssignees : assignees} />
+                    </Card>
+                </Grid>
+                <Grid
+                    item
+                    xs={6}
                 >
                     <Card className={classes.gridItemSecondRow}>
                         <Typography className={classes.title}
@@ -141,22 +196,24 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                 </Grid>
                 <Grid
                     item
-                    lg={3}
-                    md={6}
-                    xl={3}
-                    xs={12}
+                    xs={3}
                 >
                     <Card className={classes.gridItemSecondRow}>
-                        <Typography className={classes.title}
-                            color="textSecondary"
-                            gutterBottom
-                            variant="body2">Teams
-                        </Typography>
-                        <ChartLegend data={teams} />
+                        <div className={classes.cardWithFilter}>
+                            <Typography className={classes.title}
+                                color="textSecondary"
+                                gutterBottom
+                                variant="body2">Teams
+                            </Typography>
+                            <StatefulFilterMenu
+                                data={teams}
+                                filterName={IncidentFilterTypes[IncidentFilterTypes.teams]} />
+                        </div>
+                        <ChartLegend data={isFiltered ? filteredteams : teams} />
                         <StandardPieChart
                             minHeight={chartMinHeight}
                             className={classes.gridSubItemCenter}
-                            data={teams} />
+                            data={isFiltered ? filteredteams : teams} />
                     </Card>
                 </Grid>
                 <Grid
@@ -167,16 +224,21 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xs={12}
                 >
                     <Card className={classes.gridItemThirdRow}>
-                        <Typography className={classes.title}
-                            color="textSecondary"
-                            gutterBottom
-                            variant="body2">Root causes
-                        </Typography>
-                        <ChartLegend data={rootCauses} />
+                        <div className={classes.cardWithFilter}>
+                            <Typography className={classes.title}
+                                color="textSecondary"
+                                gutterBottom
+                                variant="body2">Root causes
+                            </Typography>
+                            <StatefulFilterMenu
+                                data={rootCauses}
+                                filterName={IncidentFilterTypes[IncidentFilterTypes.rootCauses]} />
+                        </div>
+                        <ChartLegend data={isFiltered ? filteredrootCauses : rootCauses} />
                         <StandardPieChart
                             className={classes.gridSubItemCenter}
                             minHeight={"266px"}
-                            data={rootCauses} />
+                            data={isFiltered ? filteredrootCauses : rootCauses} />
                     </Card>
                 </Grid>
                 <Grid
@@ -187,15 +249,20 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xs={12}
                 >
                     <Card className={classes.gridItemThirdRow}>
-                        <Typography className={classes.title}
-                            color="textSecondary"
-                            gutterBottom
-                            variant="body2">Services
-                        </Typography>
+                        <div className={classes.cardWithFilter}>
+                            <Typography className={classes.title}
+                                color="textSecondary"
+                                gutterBottom
+                                variant="body2">Services
+                            </Typography>
+                            <StatefulFilterMenu
+                                data={services}
+                                filterName={IncidentFilterTypes[IncidentFilterTypes.services]} />
+                        </div>
                         <StandardPieChart
                             className={classes.gridSubItemCenter}
                             minHeight={chartMinHeight}
-                            data={services} />
+                            data={isFiltered ? filteredservices : services} />
                     </Card>
                 </Grid>
                 <Grid
@@ -206,12 +273,19 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xs={12}
                 >
                     <Card className={classes.gridItemThirdRow}>
-                        <Typography className={classes.title}
-                            color="textSecondary"
-                            gutterBottom
-                            variant="body2">Severities
-                        </Typography>
-                        <VerticalBarChart className={clsx([classes.gridSubItemCenter, classes.title])} data={severities} minHeight={280} />
+                        <div className={classes.cardWithFilter}>
+                            <Typography className={classes.title}
+                                color="textSecondary"
+                                gutterBottom
+                                variant="body2">Severities
+                            </Typography>
+                            <StatefulFilterMenu
+                                data={severities}
+                                filterName={IncidentFilterTypes[IncidentFilterTypes.severities]} />
+                        </div>
+                        <VerticalBarChart className={clsx([classes.gridSubItemCenter, classes.title])} 
+                        data={isFiltered ? filteredseverities : severities} 
+                        minHeight={280} />
                     </Card>
                 </Grid>
                 <Grid
@@ -222,12 +296,19 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xs={12}
                 >
                     <Card className={classes.gridItemThirdRow}>
-                        <Typography className={classes.title}
-                            color="textSecondary"
-                            gutterBottom
-                            variant="body2">Statuses
+                        <div className={classes.cardWithFilter}>
+                            <Typography className={classes.title}
+                                color="textSecondary"
+                                gutterBottom
+                                variant="body2">Statuses
                         </Typography>
-                        <VerticalBarChart className={clsx([classes.gridSubItemCenter, classes.title])} data={statuses} minHeight={280} />
+                            <StatefulFilterMenu
+                                data={statuses}
+                                filterName={IncidentFilterTypes[IncidentFilterTypes.statuses]} />
+                        </div>
+                        <VerticalBarChart className={clsx([classes.gridSubItemCenter, classes.title])} 
+                        data={isFiltered ? filteredstatuses : statuses} 
+                        minHeight={280} />
                     </Card>
                 </Grid>
                 <Grid item className={classes.fullWidth}>

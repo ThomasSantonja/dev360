@@ -1,11 +1,10 @@
 import React, { Dispatch } from "react";
-import { Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, makeStyles, Theme, createStyles, AppBar } from "@material-ui/core";
+import { Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, makeStyles, Theme, createStyles, AppBar, CircularProgress, Tooltip } from "@material-ui/core";
 import DashboardIcon from "./icons/DashboardIcon";
 import IncidentsIcon from "./icons/IncidentsIcon";
 import BugsIcon from "./icons/BugsIcon";
 import ProductivityIcon from "./icons/ProductivityIcon";
 import RoadmapIcon from "./icons/RoadmapIcon";
-import SlidersIcon from "./icons/SlidersIcon";
 import SettingsIcon from "./icons/SettingsIcon";
 import DownloadIcon from "./icons/DownloadIcon";
 import { CustomTheme } from "../theme/CustomTheme";
@@ -14,11 +13,11 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
-import { ElectronResponse, ElectronRequest } from "../../main/models/app-api-payload";
+import { ElectronRequest } from "../../main/models/app-api-payload";
 import { State } from "../redux/store";
-import { OpenMainDrawerCommand, ToggleDrawerOpenStatus } from "../redux/viewModels/appViewModel";
+import { ToggleDrawerOpenStatus } from "../redux/viewModels/appViewModel";
 import { connect } from "react-redux";
-import { FetchData } from "../redux/viewModels/incidentsViewModel";
+import { FetchData, IncidentsFilters } from "../redux/viewModels/incidentsViewModel";
 import { RefreshStrategy } from "../../main/main-api";
 import { JiraApi } from "../../main/jira/jira-api";
 
@@ -47,6 +46,10 @@ const localAppBarStyles = makeStyles((theme: Theme) =>
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.enteringScreen,
             }),
+        },
+        menuReload: {
+            width: theme.spacing(4),
+            height: theme.spacing(4),
         },
         menuButton: {
             marginRight: theme.spacing(2),
@@ -111,7 +114,8 @@ export function Navigation(props: Readonly<{
     handleDrawerClick?: any,
     handleRefreshClick?: any,
     isLoading?: boolean,
-    lastUpdate?: Date
+    lastUpdate?: Date,
+    filters?: IncidentsFilters
 }>) {
     const classes = localAppBarStyles();
 
@@ -134,13 +138,23 @@ export function Navigation(props: Readonly<{
                     <Typography variant="h6" noWrap>
                         {props.route}
                     </Typography>
-                    <IconButton color="inherit"
-                        edge="end"
-                        disabled={props.isLoading}
-                        className={classes.menuButtonEnd}
-                        onClick={() => props.handleRefreshClick(props.route)}>
-                        <RefreshIcon />
-                    </IconButton>
+                    {
+                        props.isLoading
+                            ?
+                            <div className={classes.menuButtonEnd}>
+                                <CircularProgress color="secondary" size={"2rem"} />
+                            </div>
+                            :
+                            <Tooltip title={`last updated on : ${props.lastUpdate?.toLocaleString()}`}>
+                                <IconButton color="inherit"
+                                    edge="end"
+                                    disabled={props.isLoading}
+                                    className={classes.menuButtonEnd}
+                                    onClick={() => props.handleRefreshClick(props.route, props.filters)}>
+                                    <RefreshIcon />
+                                </IconButton>
+                            </Tooltip>
+                    }
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -156,15 +170,15 @@ export function Navigation(props: Readonly<{
                     }),
                 }}
             >
-                <List>
+                {/* <List>
                     <ListItem>
                         <ListItemIcon>
                             <DashboardIcon />
                         </ListItemIcon>
                         <ListItemText primaryTypographyProps={{ className: classes.menuTypo }}>Dashboards</ListItemText>
                     </ListItem>
-                </List>
-                <Divider />
+                </List> 
+                <Divider />*/}
                 <List>
                     <Link to='/incidents' className={classes.link}>
                         <ListItem button key='Incidents'>
@@ -173,43 +187,47 @@ export function Navigation(props: Readonly<{
                         </ListItem>
                     </Link>
                     <Link to='/Bugs' className={classes.link}>
-                        <ListItem button key='Bugs'>
+                        <ListItem button key='Bugs' disabled>
                             <ListItemIcon><BugsIcon /></ListItemIcon>
                             <ListItemText primaryTypographyProps={{ className: classes.menuTypo }} primary='Bugs' />
                         </ListItem>
                     </Link>
                     <Link to='/Productivity' className={classes.link}>
-                        <ListItem button key='Productivity'>
+                        <ListItem button key='Productivity' disabled>
                             <ListItemIcon><ProductivityIcon /></ListItemIcon>
                             <ListItemText primaryTypographyProps={{ className: classes.menuTypo }} primary='Productivity' />
                         </ListItem>
                     </Link>
                     <Link to='/Roadmap' className={classes.link}>
-                        <ListItem button key='Roadmap'>
+                        <ListItem button key='Roadmap' disabled>
                             <ListItemIcon><RoadmapIcon /></ListItemIcon>
                             <ListItemText primaryTypographyProps={{ className: classes.menuTypo }} primary='Roadmap' />
                         </ListItem>
                     </Link>
                 </List>
                 <Divider />
-                <List>
+                {/* <List>
                     <ListItem>
                         <ListItemIcon>
                             <SlidersIcon />
                         </ListItemIcon>
                         <ListItemText>Settings</ListItemText>
                     </ListItem>
-                </List>
+                </List> */}
                 <Divider />
                 <List>
-                    <ListItem button key='Preferences'>
-                        <ListItemIcon><SettingsIcon /></ListItemIcon>
-                        <ListItemText primaryTypographyProps={{ className: classes.menuTypo }} primary='Preferences' />
-                    </ListItem>
-                    <ListItem button key='Export'>
-                        <ListItemIcon><DownloadIcon /></ListItemIcon>
-                        <ListItemText primaryTypographyProps={{ className: classes.menuTypo }} primary='Export' />
-                    </ListItem>
+                    <Link to='/Preferences' className={classes.link}>
+                        <ListItem button key='Preferences' disabled>
+                            <ListItemIcon><SettingsIcon /></ListItemIcon>
+                            <ListItemText primaryTypographyProps={{ className: classes.menuTypo }} primary='Preferences' />
+                        </ListItem>
+                    </Link>
+                    <Link to='/Export' className={classes.link}>
+                        <ListItem button key='Export' disabled>
+                            <ListItemIcon><DownloadIcon /></ListItemIcon>
+                            <ListItemText primaryTypographyProps={{ className: classes.menuTypo }} primary='Export' />
+                        </ListItem>
+                    </Link>
                 </List>
             </Drawer>
         </div>
@@ -220,8 +238,10 @@ const mapStateToProps = (state: State) => (
     {
         open: state.UpdateApplicationState.DrawerOpen,
         route: state.UpdateApplicationState.Route,
+        //all of this will need to be turned into an abstract generic layer when moving to more than one page
         isLoading: state.UpdateIncidentsState.isFetching,
-        lastUpdate: state.UpdateIncidentsState.lastUpdate
+        lastUpdate: state.UpdateIncidentsState.lastUpdate,
+        filters: state.UpdateIncidentsState.filters
     });
 
 
@@ -234,7 +254,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>) => {
         handleDrawerClick: (open: boolean) => {
             dispatch(ToggleDrawerOpenStatus(open));
         },
-        handleRefreshClick: (route: string) => {
+        handleRefreshClick: (route: string, filters: IncidentsFilters) => {
             let request: ElectronRequest = { parameters: RefreshStrategy.force_remote } as ElectronRequest;
             switch (route) {
                 case "Incidents":
@@ -245,7 +265,8 @@ const mapDispatchToProps = (dispatch: Dispatch<any>) => {
                     console.warn(`Unknown route ${route}, no action taken`);
                     return;
             };
-            dispatch(FetchData(request));
+
+            dispatch(FetchData(request, !filters.noFilters));
         }
     }
 }

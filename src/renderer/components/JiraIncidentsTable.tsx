@@ -1,4 +1,4 @@
-import { makeStyles, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Theme, createStyles, withStyles, TablePagination, Tooltip, Typography, Avatar, Chip } from "@material-ui/core";
+import { makeStyles, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Theme, createStyles, withStyles, TablePagination, Tooltip, Typography, Avatar, Chip, Button, ButtonBaseActions } from "@material-ui/core";
 import React, { Dispatch } from "react";
 import { JiraModels } from "../../main/models/jira-models";
 import IncidentsTimeline from "./IncidentTimeline";
@@ -8,6 +8,7 @@ import { JiraApi } from "../../main/jira/jira-api";
 import { ElectronRequest } from "../../main/models/app-api-payload";
 import { State } from "../redux/store";
 import { connect } from "react-redux";
+import { shell } from "electron";
 
 const StyledTableCell = withStyles((theme: Theme) =>
     createStyles({
@@ -111,6 +112,12 @@ function JiraIncidentsTable(props: Readonly<{ data: Array<JiraModels.Issue>, ava
         }
     }
 
+    const incidentClick = (event: any) => {
+        if (event?.currentTarget?.innerText) {
+            shell.openExternal(`https://ssense.atlassian.net/browse/${event.currentTarget.innerText}`);
+        }
+    }
+
     return (
         <Paper className={classes.root}>
             <TableContainer component={Paper}>
@@ -131,7 +138,13 @@ function JiraIncidentsTable(props: Readonly<{ data: Array<JiraModels.Issue>, ava
                         {
                             props.data?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: JiraModels.Issue) => (
                                 <StyledTableRow key={row.key}>
-                                    <TableCell><Tooltip title={row.fields?.summary}><Typography className={classes.keyText}>{row.key}</Typography></Tooltip></TableCell>
+                                    <TableCell>
+                                        <Tooltip title={row.fields?.summary}>
+                                            <Button onClick={incidentClick}>
+                                                {row.key}
+                                            </Button>
+                                        </Tooltip>
+                                    </TableCell>
                                     <TableCell align="left">{row.fields?.status?.name ?? NONE_VALUE}</TableCell>
                                     <TableCell align="left">{row.fields?.project?.name ?? NONE_VALUE}
                                         {/* <Chip

@@ -116,6 +116,7 @@
     "react-hot-loader": "^4.12.21",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.1",
+    "source-map-support": "^0.5.19",
     "typeface-roboto": "0.0.75",
     "webpack": "^4.43.0"
   }

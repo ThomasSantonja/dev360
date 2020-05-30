@@ -1,5 +1,5 @@
 import { makeStyles, Card, CardContent, Grid, Typography, Tooltip, Chip, FormControl, InputLabel, Select, MenuItem, IconButton, Menu } from "@material-ui/core";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import clsx from 'clsx';
 import { MoreVert } from '@material-ui/icons';
 import humanizeDuration from "humanize-duration";
@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 700
     },
     cardRoot: {
-        width: "100%",        
+        width: "100%",
         padding: theme.spacing(1),
         "&:last-child": {
             paddingBottom: theme.spacing(1)
@@ -83,16 +83,24 @@ function compare(a: NameValuePair, b: NameValuePair) {
     // Use toUpperCase() to ignore character casing
     const dateA = a.name.toUpperCase();
     const dateB = b.name.toUpperCase();
-  
+
     let comparison = 0;
     if (dateA > dateB) {
-      comparison = 1;
+        comparison = 1;
     } else if (dateA < dateB) {
-      comparison = -1;
+        comparison = -1;
     }
     return comparison;
-  }
-  
+}
+
+function usePrevious<T>(value: T) {
+    const ref = useRef<T>();
+    useEffect(() => {
+        ref.current = value;
+    });
+    return ref.current;
+}
+
 
 export default function TimeDisplay(props: Readonly<{
     className: string,
@@ -106,14 +114,19 @@ export default function TimeDisplay(props: Readonly<{
     const classes = useStyles();
     const [index, setIndex] = React.useState(0);
 
-    const calculateTimeValues = (): Array<{ name: string, value: number }> => {
+    const calculateTimeValues = (index: number): Array<{ name: string, value: number }> => {
         //calculating the time for this chart
         if (!payload) {
             return new Array();
         }
+        var pl = payload;
         var data = new Array<{ key: string, value: number[] }>();
 
-        var issuesWithValues = payload.issues.filter((val) => {
+        if (payloadFiltered && payloadFiltered.issues.length !== payload.issues.length) {
+            pl = payloadFiltered;
+        }
+
+        var issuesWithValues = pl.issues.filter((val) => {
             if (!val) {
                 return false;
             }
@@ -139,11 +152,46 @@ export default function TimeDisplay(props: Readonly<{
             }
         });
         calculatedData.sort(compare);
+        console.log(`calculated the payload for the chart: `, calculatedData);
         return calculatedData;
     }
 
-    const [chartTimes, setChartTimes] = React.useState(calculateTimeValues());
+    const getSummaryValue = (index: number): TimeSpan => {
+        if (!payload) {
+            return new TimeSpan(0);
+        }
+        var pl = payload;
+        if (payloadFiltered && payloadFiltered.issues.length !== payload.issues.length) {
+            pl = payloadFiltered;
+        }
+        var timespan = (pl as any)[timeExplanation[index].fieldName];
+        if(!timespan){
+            return new TimeSpan(0);
+        }
+
+        var ms = average
+            ? timespan.totalMilliSeconds / pl.issues.length
+            : timespan.totalMilliSeconds;
+        return new TimeSpan(ms);
+    }
+
+    //hack to ensure the first display of the trend chart, in the future a real loader manager that prevent the rendering before all the back end is ready would be ideal
+    const prevPayload = usePrevious(payload);
+    const prevFilter = usePrevious(payloadFiltered);
+    useEffect(() => {
+        if (prevPayload?.issues.length !== payload?.issues?.length) {
+            handleClose(index);
+        }
+        if (payloadFiltered && payloadFiltered.issues.length !== prevFilter?.issues.length) {
+            handleClose(index);
+        }
+    }, [payload, payloadFiltered]);
+
+    const [chartTimes, setChartTimes] = React.useState([{ name: "", value: 0 }]);
+    const [summaryValue, setSummaryValue] = React.useState(null as unknown as TimeSpan);
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [title, setTitle] = React.useState("");
+    const [explanation, setExplanation] = React.useState("");
 
     const handleClick = (event: any) => {
         setAnchorEl(event.currentTarget);
@@ -153,7 +201,11 @@ export default function TimeDisplay(props: Readonly<{
         setAnchorEl(null);
         if (index >= 0 && index < timeExplanation.length && payload) {
             setIndex(index);
-            setChartTimes(calculateTimeValues());
+            setSummaryValue(getSummaryValue(index));
+            setChartTimes(calculateTimeValues(index));
+            setTitle(timeExplanation[index].title);
+            setExplanation(timeExplanation[index].explanation);
+            console.log(`handleClose triggered with ${index}, values: ${summaryValue}, ${timeExplanation[index].title}, ${timeExplanation[index].explanation}`);
         }
     };
 
@@ -162,19 +214,18 @@ export default function TimeDisplay(props: Readonly<{
             <CardContent className={classes.cardRoot}>
                 <div className={classes.root}>
                     <div className={classes.data}>
-                        <Tooltip title={timeExplanation[index].explanation}>
+                        <Tooltip title={explanation}>
                             <Typography className={classes.title}
-                                gutterBottom>{selectedType} of {timeExplanation[index].title}</Typography>
+                                color="textSecondary"
+                                variant="body2"
+                                gutterBottom>{selectedType} of {title}</Typography>
                         </Tooltip>
-                        <Typography variant="h5">{
-                            humanizeDuration(payload
-                                ? (average
-                                    ? (payload as any)[timeExplanation[index].fieldName].totalMilliSeconds / payload.issues.length
-                                    : (payload as any)[timeExplanation[index].fieldName].totalMilliSeconds
-                                )
-                                : 0, { largest: 2, maxDecimalPoints: 1 })
-                        }
-                        </Typography>
+                        <Tooltip title={`Exactly: ${summaryValue?.toString()}`}>
+                            <Typography variant="h5">{
+                                humanizeDuration(summaryValue?.totalMilliSeconds ?? 0, { largest: 2, maxDecimalPoints: 1 })
+                            }
+                            </Typography>
+                        </Tooltip>
                     </div>
                     <LineChart
                         data={chartTimes}
