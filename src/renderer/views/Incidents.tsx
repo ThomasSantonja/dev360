@@ -109,7 +109,8 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
     const filteredservices = props.incidents?.filteredPayload?.services?.ToArray();
     const filteredseverities = props.incidents?.filteredPayload?.severities?.ToArray();
     //next version, out of scope for MVP
-    //const filteredtimeline = props.incidents?.filteredPayload?.assignees?.ToArray();
+    //const filteredtimeline = props.incidents?.filteredPayload?.timeline?.ToBasicJs();
+    const testingTimeline = props.incidents?.payload?.timeline?.FilterWith(props.incidents?.filteredPayload?.timeline);
 
     return (
         <div className={classes.root}>
@@ -143,7 +144,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     <TimeDisplay
                         className={classes.gridItemFirstRow}
                         selectedType="Average"
-                        average 
+                        average
                         payload={props.incidents?.payload}
                         payloadFiltered={props.incidents?.filteredPayload} />
                 </Grid>
@@ -191,7 +192,11 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                             gutterBottom
                             variant="body2">Timeline
                         </Typography>
-                        <ChartTimeline className={classes.gridSubItemCenter} data={timeline} series={props.incidents?.payload?.timeline?.series} minHeight={280} />
+                        <ChartTimeline
+                            className={classes.gridSubItemCenter}
+                            data={isFiltered ? testingTimeline : timeline}
+                            isFiltered={isFiltered}
+                            series={props.incidents?.payload?.timeline?.series} minHeight={280} />
                     </Card>
                 </Grid>
                 <Grid
@@ -283,9 +288,9 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                                 data={severities}
                                 filterName={IncidentFilterTypes[IncidentFilterTypes.severities]} />
                         </div>
-                        <VerticalBarChart className={clsx([classes.gridSubItemCenter, classes.title])} 
-                        data={isFiltered ? filteredseverities : severities} 
-                        minHeight={280} />
+                        <VerticalBarChart className={clsx([classes.gridSubItemCenter, classes.title])}
+                            data={isFiltered ? filteredseverities : severities}
+                            minHeight={280} />
                     </Card>
                 </Grid>
                 <Grid
@@ -306,9 +311,9 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                                 data={statuses}
                                 filterName={IncidentFilterTypes[IncidentFilterTypes.statuses]} />
                         </div>
-                        <VerticalBarChart className={clsx([classes.gridSubItemCenter, classes.title])} 
-                        data={isFiltered ? filteredstatuses : statuses} 
-                        minHeight={280} />
+                        <VerticalBarChart className={clsx([classes.gridSubItemCenter, classes.title])}
+                            data={isFiltered ? filteredstatuses : statuses}
+                            minHeight={280} />
                     </Card>
                 </Grid>
                 <Grid item className={classes.fullWidth}>
