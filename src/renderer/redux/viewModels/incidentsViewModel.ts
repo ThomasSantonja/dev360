@@ -197,6 +197,15 @@ function applyFilter(payload: JiraIncidentRootObject, filters: IncidentsFilters)
         if (!hasTeam(filters.teams, issue)) {
             continue;
         }
+        var incidentDate;
+        if (issue.fields.customfield_14871) { //introduction
+            incidentDate = issue.fields.customfield_14871 = new Date(issue.fields.customfield_14871);
+        } else {
+            incidentDate = new Date(issue.fields.created);
+        }
+        if (!filters.years.includes(incidentDate.getFullYear().toString())) {
+            continue;
+        }
         filteredPayload.issues.push(issue);
     }
     filteredPayload.total = filteredPayload.issues.length;
@@ -223,6 +232,10 @@ function hasTeam(teams: Array<string>, issue: JiraModels.Issue): boolean {
             if (link?.type?.inward == "is caused by" && link.inwardIssue) {
                 issueTeams.push(link.inwardIssue?.fields?.project?.name ?? NONE_TEXT);
             }
+        }
+        //if the issue had no compatible links then the team is "NONE"
+        if (issueTeams.length === 0) {
+            issueTeams.push(NONE_TEXT);
         }
     }
     return teams.filter(s => issueTeams.includes(s)).length > 0;
@@ -383,7 +396,7 @@ function InitialiseFilters(root: JiraIncidentRootObject): IncidentsFilters {
     newFilter.severities = root.severities.GetKeys();
     newFilter.statuses = root.statuses.GetKeys();
     newFilter.teams = root.teams.GetKeys();
-    //years and keys not supported for filtering yet
+    newFilter.years = root.timeline.series;
     return newFilter;
 }
 

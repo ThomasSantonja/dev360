@@ -111,6 +111,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
     //next version, out of scope for MVP
     //const filteredtimeline = props.incidents?.filteredPayload?.timeline?.ToBasicJs();
     const testingTimeline = props.incidents?.payload?.timeline?.FilterWith(props.incidents?.filteredPayload?.timeline);
+    const yearFilters = props.incidents?.payload?.timeline?.series.map(s => { return { name: s } });
 
     return (
         <div className={classes.root}>
@@ -187,11 +188,16 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     xs={6}
                 >
                     <Card className={classes.gridItemSecondRow}>
-                        <Typography className={classes.title}
-                            color="textSecondary"
-                            gutterBottom
-                            variant="body2">Timeline
-                        </Typography>
+                        <div className={classes.cardWithFilter}>
+                            <Typography className={classes.title}
+                                color="textSecondary"
+                                gutterBottom
+                                variant="body2">Timeline
+                            </Typography>
+                            <StatefulFilterMenu
+                                data={yearFilters}
+                                filterName={IncidentFilterTypes[IncidentFilterTypes.years]} />
+                        </div>
                         <ChartTimeline
                             className={classes.gridSubItemCenter}
                             data={isFiltered ? testingTimeline : timeline}
@@ -214,7 +220,7 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                                 data={teams}
                                 filterName={IncidentFilterTypes[IncidentFilterTypes.teams]} />
                         </div>
-                        <ChartLegend data={isFiltered ? filteredteams : teams} />
+
                         <StandardPieChart
                             minHeight={chartMinHeight}
                             className={classes.gridSubItemCenter}
@@ -317,7 +323,10 @@ export function IncidentsView(props: Readonly<{ incidents: IncidentsState, getDa
                     </Card>
                 </Grid>
                 <Grid item className={classes.fullWidth}>
-                    <StatefulJiraIncidentsTable data={props.incidents?.payload?.issues} />
+                    <StatefulJiraIncidentsTable
+                        data={isFiltered
+                            ? props.incidents?.filteredPayload?.issues
+                            : props.incidents?.payload?.issues} />
                 </Grid>
             </Grid>
         </div>

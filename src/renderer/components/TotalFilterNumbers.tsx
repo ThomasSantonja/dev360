@@ -6,6 +6,7 @@ import FilterIconReset from "./icons/FilterIconReset";
 import { connect } from "react-redux";
 import { ResetFilters } from "../redux/viewModels/incidentsViewModel";
 import { State } from "../redux/store";
+import FilterIcon from "./icons/FilterIcon";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -35,12 +36,12 @@ const useStyles = makeStyles(theme => ({
     },
     button: {
         marginLeft: "auto",
-        width: theme.spacing(4),
-        height: theme.spacing(4),
+        // width: theme.spacing(4),
+        // height: theme.spacing(4),
     },
     buttonIcon: {
-        width: theme.spacing(2.5),
-        height: theme.spacing(2.5),
+        width: theme.spacing(2),
+        height: theme.spacing(2),
     },
     title: {
         fontWeight: 700
@@ -119,11 +120,16 @@ export function TotalFilterNumbers(props: Readonly<any>) {
                             }
                         </div>
                     </div>
-                    <Tooltip title="Reset the filters">
-                        <IconButton className={classes.button} onClick={handleClick} disabled={filters?.noFilters}>
-                            <FilterIconReset className={classes.buttonIcon} />
-                        </IconButton>
-                    </Tooltip>
+                    {filters.noFilters
+                        ?
+                        <div></div>
+                        :
+                        <Chip className={classes.button}
+                            // icon={<FilterIcon className={classes.buttonIcon} />}
+                            label="Reset filters"
+                            onDelete={handleClick}
+                        />
+                    }
                 </div>
             </CardContent>
         </Card>

@@ -71,7 +71,7 @@ export default function IncidentsTimeline(props: Readonly<{ className?: string, 
 
     return (
         <div className={clsx(classes.root, className)}>
-            {incident?.fields?.customfield_14971
+            {incident?.fields?.customfield_14871
                 ? (<HtmlTooltip title={"introduction date: " + dateFormat(incident.fields.customfield_14871, "yyyy-mm-dd HH:MM:ss")}>
                     <ValidEntry />
                 </HtmlTooltip>)
