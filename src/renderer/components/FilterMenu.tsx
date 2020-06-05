@@ -4,7 +4,7 @@ import FilterIcon from "./icons/FilterIcon";
 import { NameValuePair } from "../../main/utils/nvp-array";
 import { connect } from "react-redux";
 import { State } from "../redux/store";
-import { IncidentsFilters, UpdateFilters, IncidentFilterTypesStrings } from "../redux/viewModels/incidentsViewModel";
+import { IncidentsFilters, UpdateFilters, IncidentFilterTypesStrings, IncidentsCommands } from "../redux/viewModels/incidentsViewModel";
 
 const menuStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -50,7 +50,8 @@ export function FilterMenu(props: Readonly<{
     data: Array<NameValuePair>,
     filterName: IncidentFilterTypesStrings,
     currentFilter: IncidentsFilters,
-    updateFilter: (key: Array<string>, name: string) => void
+    updateFilter: (key: Array<string>, name: string) => void,
+    debug: () => void
 }>) {
     const { className, data, currentFilter, filterName, ...rest } = props;
     const classes = menuStyles();
@@ -72,13 +73,14 @@ export function FilterMenu(props: Readonly<{
 
     const multiSelect = (event: any, key: string) => {
         event.stopPropagation();
+        //props.debug();
         var filters = (currentFilter as any)[filterName] as Array<string>;
         var idx = filters.indexOf(key);
         if (idx !== -1) {
             filters.splice(idx, 1);
         } else {
             filters.push(key)
-        }        
+        }
         props.updateFilter(filters, filterName);
     }
 
@@ -118,6 +120,9 @@ const mapDispatchToProps = (dispatch: Dispatch<any>) => {
         updateFilter: (key: string[], name: IncidentFilterTypesStrings) => {
             console.log(`updating the filter with:`, key);
             dispatch(UpdateFilters(key, name));
+        },
+        debug: () => {
+            dispatch({ type: IncidentsCommands.DEBUG });
         }
     }
 }

@@ -95,7 +95,8 @@ export enum IncidentsCommands {
     FETCH_DATA = 'FETCH_DATA',
     FETCH_DATA_FAILURE = 'FETCH_DATA_FAILURE',
     FETCH_DATA_SUCCESS = 'FETCH_DATA_SUCCES',
-    FILTERS_UPDATED = 'FILTERS_UPDATED'
+    FILTERS_UPDATED = 'FILTERS_UPDATED',
+    DEBUG = 'DEBUG'
 }
 
 const NONE_TEXT = "None";
@@ -156,7 +157,7 @@ export function UpdateIncidentsState(state: IncidentsState = defaultIncidentsSta
             if (filters.noFilters) {
                 filteredPayload = state.payload;
             } else {
-                filteredPayload = sanitizeIncidents(applyFilter(state.payload, filters));
+                filteredPayload = applyFilter(state.payload, filters);
             }
             return Object.assign<{}, IncidentsState, IncidentsState>(
                 {},
@@ -165,6 +166,12 @@ export function UpdateIncidentsState(state: IncidentsState = defaultIncidentsSta
                     filters,
                     filteredPayload
                 } as IncidentsState);
+        case IncidentsCommands.DEBUG:
+            //enable the display of state here to understand the different between the payload and the filtered payload
+            //payload should only change on refresh
+            var payloadReader = state.payload;
+            var filteredPayloadReader = state.filteredPayload;
+            return state;
         default:
             return state
     }
@@ -396,7 +403,7 @@ function InitialiseFilters(root: JiraIncidentRootObject): IncidentsFilters {
     newFilter.severities = root.severities.GetKeys();
     newFilter.statuses = root.statuses.GetKeys();
     newFilter.teams = root.teams.GetKeys();
-    newFilter.years = root.timeline.series;
+    newFilter.years = Array.from(root.timeline.series); //values not references, we are interested in the values anyway, the actual root.timeline should not be updated by a filter change
     return newFilter;
 }
 

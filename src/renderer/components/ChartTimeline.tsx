@@ -46,19 +46,7 @@ export default function ChartTimeline(props: Readonly<{
     isFiltered: boolean,
     minHeight: number
 }>) {
-
-    //
     const { data, series, isFiltered, className, minHeight, ...rest } = props;
-
-    // const data = [
-    //     { name: "January", "2020": 10, "2019": 5, "filtered-2020": 6, "filtered-2019": 0 },
-    //     { name: "February", "2020": 8, "2019": 1, "filtered-2020": 2, "filtered-2019": 1 },
-    //     { name: "March", "2020": 16, "2019": 0, "filtered-2020": 0, "filtered-2019": 0 },
-    //     { name: "April", "2020": 4, "2019": 0, "filtered-2020": 5, "filtered-2019": 1 },
-    // ]
-
-    // const series = ["2019", "2020"];
-    // const isFiltered = true;
 
     if (!isFiltered) {
         return (
@@ -71,7 +59,7 @@ export default function ChartTimeline(props: Readonly<{
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" tick={{ fill: 'white' }} />
                     <YAxis tick={{ fill: 'white' }} />
-                    <Tooltip content={<ChartTooltip />} />
+                    <Tooltip content={<ChartTooltip />} cursor={false} />
                     <Legend />
                     {
                         series?.map((ser, idx) =>
